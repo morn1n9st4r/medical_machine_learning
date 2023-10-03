@@ -15,6 +15,13 @@ from django.views.decorators.http import require_http_methods
 @login_required(login_url='/login')
 def home(request):
     records = Record.objects.all()
+
+    if request.method == 'POST':
+        record_id = request.POST.get('record-id')
+        record = Record.objects.filter(pk=record_id).first()
+        if record and record.author == request.user:
+            record.delete()
+
     return render(request, 'main/home.html', {'records': records})
 
 
