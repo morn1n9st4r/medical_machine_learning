@@ -12,7 +12,9 @@
             <p>{{record.sex}}</p>
         </div>
         <div>
-            Buttons
+            {% if user == record.author %}
+                <a href="{% url 'update_record' record.pk %}">Edit</a>
+            {%endif%}
         </div>
     </div>
     <div class="card-footer text-muted">
