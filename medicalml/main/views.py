@@ -3,6 +3,8 @@ from .forms import RegisterForm
 from django.contrib.auth import login, logout, authenticate
 
 from .forms import RecordForm
+from .models import Record
+
 
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -10,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/login')
 def home(request):
-    return render(request, 'main/home.html')
+    records = Record.objects.all()
+    return render(request, 'main/home.html', {'records': records})
 
 
 @login_required(login_url='/login')
