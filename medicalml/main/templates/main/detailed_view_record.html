@@ -1,0 +1,48 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{{form|crispy}}
+<h2>Detailed View</h2>
+<p><strong>First Name:</strong> {{ record.first_name }}</p>
+<p><strong>Last Name:</strong> {{ record.last_name }}</p>
+<p><strong>Age:</strong> {{ record.age }}</p>
+<p><strong>Date of Birth:</strong> {{ record.date_of_birth }}</p>
+<p><strong>Gender:</strong> {{ record.gender }}</p>
+<p><strong>Contact Number:</strong> {{ record.contact_number }}</p>
+<p><strong>Emergency Contact Number:</strong> {{ record.emergency_contact_number }}</p>
+<p><strong>Emergency Contact First Name:</strong> {{ record.emergency_contact_first_name }}</p>
+<p><strong>Emergency Contact Last Name:</strong> {{ record.emergency_contact_last_name }}</p>
+<p><strong>Emergency Contact Relationship:</strong> {{ record.emergency_contact_relationship }}</p>
+<p><strong>Allergies:</strong> {{ record.allergies }}</p>
+<p><strong>Chronic Diseases:</strong> {{ record.chronic_diseases }}</p>
+<p><strong>Primary Doctor:</strong> {{ record.primary_doctor }}</p>
+<p><strong>Notes:</strong> {{ record.notes }}</p>
+
+
+{% for phys in physician %}
+<div class="card mt-2">
+    <div class="card-body d-flex flex-row justify-content-between">
+        <div>
+            <h5 class="card-title">{{phys.id}}</h5>
+            <p>{{phys.height}}</p>
+            <p>{{phys.weight}}</p>
+            <p>{{phys.bp}}</p>
+            <p>{{phys.type_of_pain}}</p>
+        </div>
+        <!--<div class="row">
+            <div class="col-md-4">
+                <button class="btn btn-info">
+                    <a href="{% url 'detailed_view_record' record.pk %}" style="color: white; text-decoration: none;">Detailed View</a>
+                </button>
+            </div>
+        </div>-->
+    </div>
+</div>
+{% empty %}
+<p>No records</p>
+{% endfor %}
+
+<a href="{% url 'add_record' record.pk %}" class="btn btn-primary">Add Record</a>
+
+{% endblock %}
