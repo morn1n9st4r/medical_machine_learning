@@ -43,6 +43,7 @@
 <p>No records</p>
 {% endfor %}
 
-<a href="{% url 'add_record' record.pk %}" class="btn btn-primary">Add Record</a>
+<a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-primary">Add phys Record</a>
+<a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-primary">Add blood Record</a>
 
 {% endblock %}

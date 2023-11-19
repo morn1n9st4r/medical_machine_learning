@@ -46,7 +46,7 @@ class PatientAnalysisPhysician(models.Model):
         return f"ID: {self.id} - Patient: {self.patient_id}, Doctor: {self.doctor_id}, Date: {self.date}"
 
 
-class BloodTest(models.Model):
+class PatientBloodTest(models.Model):
     id = models.AutoField(primary_key=True)
     patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)
