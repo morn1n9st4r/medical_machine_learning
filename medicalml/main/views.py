@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .forms import RegisterForm
 from django.contrib.auth import login, logout, authenticate
 
-from .forms import PhysicianForm, BloodTestForm
-from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest
+from .forms import PhysicianForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
+from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
 from django.contrib.auth.models import User
 
 from django.views.generic.edit import UpdateView
@@ -48,7 +48,34 @@ def add_record(request, record_id, test_type):
             medical_record.save()
             return redirect('detailed_view_record', record_id=patient_record.id)
     else:
-        form = form_class()
+        form = form_class(record_id=record_id)
+        return render(request, 'main/add_record.html', {'form': form})
+
+
+
+@login_required(login_url='/login')
+def update_examinations(request, record_id, diagnosis_id):
+    patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+    patient_diagnosis = get_object_or_404(PatientDiagnosis, pk=diagnosis_id)
+
+    if request.method == 'POST':
+        form = ExaminationsForm(request.POST)
+        if form.is_valid():
+            updated_examinations = form.cleaned_data['examinations']
+
+            # split and check all already attached and prohibit duplicate
+            if patient_diagnosis.examinations == "":
+                patient_diagnosis.examinations += updated_examinations
+            else:
+                patient_diagnosis.examinations += ", " + updated_examinations
+            
+            patient_diagnosis.save()
+            return redirect('detailed_view_record', record_id=patient_record.id)  # Replace with the appropriate redirect
+    else:
+        form = ExaminationsForm()
+
+        # add html's to template from view???
+
         return render(request, 'main/add_record.html', {'form': form})
 
 
@@ -56,6 +83,9 @@ def get_form_class(test_type):
     form_classes = {
         'physician': PhysicianForm,
         'blood_test': BloodTestForm,
+
+        'diagnosis': DiagnosisForm,
+        'treatment': TreatmentForm,
     }
     
     return form_classes.get(test_type, PhysicianForm) 
@@ -77,11 +107,22 @@ def sign_up(request):
 @login_required(login_url='/login')
 def detailed_view_record(request, record_id):
     patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+
     physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
     blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
     unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
     medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
-    return render(request, 'main/detailed_view_record.html', {'record': patient_record, 'medical_examinations': medical_examinations})
+
+    patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
+
+    patient_treatments = PatientTreatment.objects.filter(patient=patient_record.pk)
+
+    return render(request, 'main/detailed_view_record.html', {
+        'record': patient_record,
+        'medical_examinations': medical_examinations,
+        'patient_diagnoses': patient_diagnoses,
+        'patient_treatments': patient_treatments,
+        })
 
 #@login_required(login_url='/login')
 #@require_http_methods(["GET", "POST"])

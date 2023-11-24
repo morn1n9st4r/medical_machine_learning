@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest
+from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
 
 
 class RegisterForm(UserCreationForm):
@@ -29,3 +29,23 @@ class BloodTestForm(forms.ModelForm):
     class Meta:
         model = PatientBloodTest
         fields = ['alb', 'alp', 'alt', 'ast', 'bil', 'bg', 'che', 'chol', 'crea', 'gct', 'prot']
+
+
+class DiagnosisForm(forms.ModelForm):
+    class Meta:
+        model = PatientDiagnosis
+        fields = ['disease_name', 'severity', 'tags', 'details']
+
+class TreatmentForm(forms.ModelForm):
+    def __init__(self, record_id, *args, **kwargs):
+        super(TreatmentForm, self).__init__(*args, **kwargs)
+        self.fields['diagnosis'].queryset = PatientDiagnosis.objects.filter(patient=record_id)
+
+    class Meta:
+        model = PatientTreatment
+        fields = ['medicine', 'quantity', 'quantity_type', 'frequency', 'start_date', 'finish_date', 'form', 'diagnosis']
+
+class ExaminationsForm(forms.ModelForm):
+    class Meta:
+        model = PatientDiagnosis
+        fields = ['examinations']

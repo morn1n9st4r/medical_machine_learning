@@ -11,7 +11,7 @@
 <p><strong>Last Name:</strong> {{ record.last_name }}</p>
 <p><strong>Age:</strong> {{ record.age }}</p>
 <p><strong>Date of Birth:</strong> {{ record.date_of_birth }}</p>
-<p><strong>Gender:</strong> {{ record.gender }}</p>
+<p><strong>Gender:</strong> {{ record.gender|tag_definition }}</p>
 <p><strong>Contact Number:</strong> {{ record.contact_number }}</p>
 <p><strong>Emergency Contact Number:</strong> {{ record.emergency_contact_number }}</p>
 <p><strong>Emergency Contact First Name:</strong> {{ record.emergency_contact_first_name }}</p>
@@ -29,10 +29,10 @@
 
 {% for examination in medical_examinations %}
     {% if examination.get_model_type == 'PatientAnalysisPhysician' %}
-    <div class="card mt-2">
+    <div class="card mt-2"  id="examination_{{examination.shortened_id}}">
         <div class="card-body d-flex flex-row justify-content-between">
             <div>
-                <h5 class="card-title">Physician test #{{examination.id}}</h5>
+                <h5 class="card-title">Physician test #{{examination.shortened_id}}</h5>
                 <p><strong>date:</strong> {{examination.date}}</p>
                 <p><strong>height:</strong> {{examination.height}}</p>
                 <p><strong>weight:</strong> {{examination.weight}}</p>
@@ -42,10 +42,10 @@
         </div>
     </div>
     {% elif examination.get_model_type == 'PatientBloodTest' %}
-        <div class="card mt-2">
+        <div class="card mt-2" id="examination_{{examination.shortened_id}}">
             <div class="card-body d-flex flex-row justify-content-between">
                 <div>
-                    <h5 class="card-title">Blood test #{{examination.id}}</h5>
+                    <h5 class="card-title">Blood test #{{examination.shortened_id}}</h5>
                     <p><strong>date:</strong> {{examination.date}}</p>
                     <p><strong>alb:</strong> {{examination.alb}}</p>
                     <p><strong>chol:</strong> {{examination.chol}}</p>
@@ -58,19 +58,63 @@
         <pre>{{ examination }}</pre>
     {% endif %}
 {% empty %}
-<p>No records</p>
+    <p>No records</p>
 {% endfor %}
-
+<!-- record.pk == patient prim key -->
 
 <div>
-    diagnosis here
     <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-primary">Add diagnosis</a>
+
+    {% for diagnosis in patient_diagnoses %}
+        <div class="card mt-2" id="diagnosis_{{diagnosis.shortened_id}}">
+            <div class="card-body d-flex flex-row justify-content-between">
+                <div>
+                    <h5 class="card-title">Diagnosis #{{diagnosis.shortened_id}}</h5>
+                    <p><strong>date:</strong> {{diagnosis.date}}</p>
+                    <p><strong>disease_name:</strong> {{diagnosis.disease_name}}</p>
+                    <p><strong>severity:</strong> {{diagnosis.severity|tag_definition}}</p>
+                    <p><strong>tag:</strong> {{diagnosis.tags|tag_definition}}</p>
+                    <p><strong>details:</strong> {{diagnosis.details}}</p>
+                    <p><strong>examinations:</strong></p>
+                    {% for uuid in diagnosis.examinations|split_examinations %}
+                        <a href="#examination_{{uuid}}">{{ uuid }}</a>,
+                    {% endfor %}
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button class="btn btn-info">
+                            <a href="{% url 'update_examinations' record.pk diagnosis.id %}" style="color: white; text-decoration: none;">Attach examination</a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No records</p>
+    {% endfor %}
 </div>
 
 
 <div>
-    treatment here
     <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-primary">Add treatment</a>
+
+    {% for treatment in patient_treatments %}
+        <div class="card mt-2">
+            <div class="card-body d-flex flex-row justify-content-between">
+                <div>
+                    <h5 class="card-title">Treatment #{{treatment.shortened_id}}</h5>
+                    <p><strong>date:</strong> {{treatment.date}}</p>
+                    <p><strong>medicine:</strong> {{treatment.medicine}}</p>
+                    <p><strong>quantity:</strong> {{treatment.quantity}} {{treatment.quantity_type}} {{treatment.frequency|tag_definition}}</p>
+                    <p><strong>take:</strong> from {{treatment.start_date}} to {{treatment.finish_date}}</p>
+                    <p><strong>form:</strong> {{treatment.form|tag_definition}}</p>
+                    <a href="#diagnosis_{{treatment.diagnosis.id}}">For diagnosis: {{treatment.diagnosis.id}}</a></li>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No records</p>
+    {% endfor %}
 </div>
 
 {% endblock %}

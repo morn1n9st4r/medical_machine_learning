@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+{% load medicalml_extras %}
+
+
+{% block content %}
+{{form|crispy}}
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}
