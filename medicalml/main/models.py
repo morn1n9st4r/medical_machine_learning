@@ -29,7 +29,6 @@ class PatientBaseRecord(models.Model):
 
 
 class MedicalRecordsABC(models.Model):
-    #id = models.AutoField()
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True)
     patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -109,7 +108,7 @@ class PatientTreatment(MedicalRecordsABC):
     finish_date = models.DateField()
     form = models.CharField(choices=FORM_CHOICES)
 
-    diagnosis = models.ForeignKey(PatientDiagnosis, on_delete=models.CASCADE)
+    diagnosis = models.CharField()
 
     def __str__(self):
         return f"Diagnosis for {self.patient} on {self.date}"

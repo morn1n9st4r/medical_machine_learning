@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
+
+from main.templatetags.medicalml_extras import tag_definition
 from .forms import RegisterForm
 from django.contrib.auth import login, logout, authenticate
 
@@ -48,8 +50,29 @@ def add_record(request, record_id, test_type):
             medical_record.save()
             return redirect('detailed_view_record', record_id=patient_record.id)
     else:
-        form = form_class(record_id=record_id)
-        return render(request, 'main/add_record.html', {'form': form})
+        form = form_class()
+
+        dynamic_html_content = ''
+        if test_type == 'treatment':
+            patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
+            for diagnosis in patient_diagnoses:
+                dynamic_html_content += f'''
+                    <div class="card mt-2" id="diagnosis_{diagnosis.shortened_id}">
+                        <div class="card-body d-flex flex-row justify-content-between">
+                            <div>
+                                <h5 class="card-title">Diagnosis #{diagnosis.shortened_id}</h5>
+                                <p><strong>date:</strong> {diagnosis.date}</p>
+                                <p><strong>disease_name:</strong> {diagnosis.disease_name}</p>
+                                <p><strong>severity:</strong> {diagnosis.severity}</p>
+                                <p><strong>tag:</strong> {diagnosis.tags}</p>
+                                <p><strong>details:</strong> {diagnosis.details}</p>
+                            </div>
+                        </div>
+                    </div>
+                '''
+        return render(request, 'main/add_record.html', {'form': form,
+                                                        'dynamic_html_content': dynamic_html_content
+                                                        })
 
 
 
@@ -74,9 +97,46 @@ def update_examinations(request, record_id, diagnosis_id):
     else:
         form = ExaminationsForm()
 
-        # add html's to template from view???
+        present_exams_shortened_ids = patient_diagnosis.examinations.split(", ")
+        physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
+        blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
+        unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
+        medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
+        
+        filtered_medical_examinations = [exam for exam in medical_examinations if exam.shortened_id not in present_exams_shortened_ids]
+        dynamic_html_content = ''
+        for exam in filtered_medical_examinations:
+            if exam.get_model_type() == "PatientAnalysisPhysician":
+                dynamic_html_content += f'''  
+                    <div class="card mt-2"  id="examination_{{exam.shortened_id}}">
+                        <div class="card-body d-flex flex-row justify-content-between">
+                            <div>
+                                <h5 class="card-title">Physician test #{exam.shortened_id}</h5>
+                                <p><strong>date:</strong> {exam.date}</p>
+                                <p><strong>height:</strong> {exam.height}</p>
+                                <p><strong>weight:</strong> {exam.weight}</p>
+                                <p><strong>Blood Pressure:</strong> {exam.bp}</p>
+                                <p><strong>Type of pain:</strong> {exam.type_of_pain}</p>
+                            </div>
+                        </div>
+                    </div>'''
+            else:
+                dynamic_html_content += f'''    
+                    <div class="card mt-2"  id="examination_{exam.shortened_id}">
+                        <div class="card-body d-flex flex-row justify-content-between">
+                            <div>
+                                <h5 class="card-title">Blood test #{exam.shortened_id}</h5>
+                                <p><strong>date:</strong> {exam.date}</p>
+                                <p><strong>alb:</strong> {exam.alb}</p>
+                                <p><strong>chol:</strong> {exam.chol}</p>
+                                <p><strong>prot:</strong> {exam.prot}</p>
+                            </div>
+                        </div>
+                    </div>'''
 
-        return render(request, 'main/add_record.html', {'form': form})
+        return render(request, 'main/add_record.html', {'form': form,
+                                                        'dynamic_html_content': dynamic_html_content
+                                                        })
 
 
 def get_form_class(test_type):

@@ -2,8 +2,40 @@
 {% block title %}Add a Record{% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var dynamicContent = document.getElementById('dynamicContent');
+
+        dynamicContent.addEventListener('click', function (event) {
+            var titleElement = event.target.closest('.card-title');
+            if (titleElement) {
+                var text = titleElement.textContent.trim();
+                var textAfterHash = text.substring(text.indexOf('#') + 1);
+                copyToClipboard(textAfterHash);
+            }
+        });
+
+        function copyToClipboard(text) {
+            var textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Text copied to clipboard!');
+        }
+    });
+</script>
+
+
 <form method="post">
     {% csrf_token %}{{form|crispy}}
     <button type="submit" class="btn btn-success">Submit</button>
 </form>
+
+<div id="dynamicContent">
+    {{ dynamic_html_content | safe }}
+</div>
+
 {% endblock %}

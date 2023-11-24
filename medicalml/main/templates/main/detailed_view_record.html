@@ -108,7 +108,7 @@
                     <p><strong>quantity:</strong> {{treatment.quantity}} {{treatment.quantity_type}} {{treatment.frequency|tag_definition}}</p>
                     <p><strong>take:</strong> from {{treatment.start_date}} to {{treatment.finish_date}}</p>
                     <p><strong>form:</strong> {{treatment.form|tag_definition}}</p>
-                    <a href="#diagnosis_{{treatment.diagnosis.id}}">For diagnosis: {{treatment.diagnosis.id}}</a></li>
+                    For diagnosis: <a href="#diagnosis_{{treatment.diagnosis}}">{{treatment.diagnosis}}</a></li>
                 </div>
             </div>
         </div>
