@@ -3,7 +3,7 @@ from .forms import RegisterForm
 from django.contrib.auth import login, logout, authenticate
 
 from .forms import PhysicianForm, BloodTestForm
-from .models import PatientBaseRecord, PatientAnalysisPhysician
+from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest
 from django.contrib.auth.models import User
 
 from django.views.generic.edit import UpdateView
@@ -11,7 +11,10 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
+from itertools import chain
+from operator import attrgetter
 
+import datetime
 
 @login_required(login_url='/login')
 def home(request):
@@ -37,10 +40,12 @@ def add_record(request, record_id, test_type):
     if request.method == 'POST':
         form = form_class(request.POST)
         if form.is_valid():
-            physician_record = form.save(commit=False)
-            physician_record.patient = patient_record
-            physician_record.doctor = current_user
-            physician_record.save()
+            medical_record = form.save(commit=False)
+            medical_record.patient = patient_record
+            medical_record.doctor = current_user
+            medical_record.date = datetime.datetime.now()
+
+            medical_record.save()
             return redirect('detailed_view_record', record_id=patient_record.id)
     else:
         form = form_class()
@@ -71,9 +76,12 @@ def sign_up(request):
 
 @login_required(login_url='/login')
 def detailed_view_record(request, record_id):
-    record = get_object_or_404(PatientBaseRecord, pk=record_id)
-    physician = PatientAnalysisPhysician.objects.filter(patient=record.pk)
-    return render(request, 'main/detailed_view_record.html', {'record': record, 'physician': physician})
+    patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+    physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
+    blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
+    unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
+    medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
+    return render(request, 'main/detailed_view_record.html', {'record': patient_record, 'medical_examinations': medical_examinations})
 
 #@login_required(login_url='/login')
 #@require_http_methods(["GET", "POST"])

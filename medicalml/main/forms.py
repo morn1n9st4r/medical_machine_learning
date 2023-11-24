@@ -22,10 +22,10 @@ class RecordForm(forms.ModelForm):
 class PhysicianForm(forms.ModelForm):
     class Meta:
         model = PatientAnalysisPhysician
-        fields = ['type_of_pain','bp','restbp','maxhr','height','weight','date']
+        fields = ['type_of_pain','bp','restbp','maxhr','height','weight']
 
 
 class BloodTestForm(forms.ModelForm):
     class Meta:
         model = PatientBloodTest
-        fields = ['date', 'alb', 'alp', 'alt', 'ast', 'bil', 'bg', 'che', 'chol', 'crea', 'gct', 'prot']
+        fields = ['alb', 'alp', 'alt', 'ast', 'bil', 'bg', 'che', 'chol', 'crea', 'gct', 'prot']

@@ -45,6 +45,9 @@ class PatientAnalysisPhysician(models.Model):
     def __str__(self):
         return f"ID: {self.id} - Patient: {self.patient_id}, Doctor: {self.doctor_id}, Date: {self.date}"
 
+    def get_model_type(self):
+        return "PatientAnalysisPhysician"
+
 
 class PatientBloodTest(models.Model):
     id = models.AutoField(primary_key=True)
@@ -65,3 +68,26 @@ class PatientBloodTest(models.Model):
 
     def __str__(self):
         return f"Blood Test for {self.patient} on {self.date}"
+    
+    def get_model_type(self):
+        return "PatientBloodTest"
+    
+
+class PatientDiagnosis(models.Model):
+    id = models.AutoField(primary_key=True)
+    patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+
+    details = ...
+    severity = ...
+    details = ...
+    details = ...
+    #related_tests = ...
+    
+
+    def __str__(self):
+        return f"Blood Test for {self.patient} on {self.date}"
+    
+    def get_model_type(self):
+        return "PatientBloodTest"

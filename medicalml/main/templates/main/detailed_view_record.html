@@ -1,8 +1,11 @@
 {% extends 'main/base.html' %}
 {% load crispy_forms_tags %}
+{% load medicalml_extras %}
+
 
 {% block content %}
 {{form|crispy}}
+
 <h2>Detailed View</h2>
 <p><strong>First Name:</strong> {{ record.first_name }}</p>
 <p><strong>Last Name:</strong> {{ record.last_name }}</p>
@@ -19,31 +22,55 @@
 <p><strong>Primary Doctor:</strong> {{ record.primary_doctor }}</p>
 <p><strong>Notes:</strong> {{ record.notes }}</p>
 
-
-{% for phys in physician %}
-<div class="card mt-2">
-    <div class="card-body d-flex flex-row justify-content-between">
-        <div>
-            <h5 class="card-title">{{phys.id}}</h5>
-            <p>{{phys.height}}</p>
-            <p>{{phys.weight}}</p>
-            <p>{{phys.bp}}</p>
-            <p>{{phys.type_of_pain}}</p>
-        </div>
-        <!--<div class="row">
-            <div class="col-md-4">
-                <button class="btn btn-info">
-                    <a href="{% url 'detailed_view_record' record.pk %}" style="color: white; text-decoration: none;">Detailed View</a>
-                </button>
-            </div>
-        </div>-->
-    </div>
+<div>
+    <a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-primary">Add phys Record</a>
+    <a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-primary">Add blood Record</a>
 </div>
+
+{% for examination in medical_examinations %}
+    {% if examination.get_model_type == 'PatientAnalysisPhysician' %}
+    <div class="card mt-2">
+        <div class="card-body d-flex flex-row justify-content-between">
+            <div>
+                <h5 class="card-title">Physician test #{{examination.id}}</h5>
+                <p><strong>date:</strong> {{examination.date}}</p>
+                <p><strong>height:</strong> {{examination.height}}</p>
+                <p><strong>weight:</strong> {{examination.weight}}</p>
+                <p><strong>Blood Pressure:</strong> {{examination.bp}}</p>
+                <p><strong>Type of pain:</strong> {{examination.type_of_pain}}</p>
+            </div>
+        </div>
+    </div>
+    {% elif examination.get_model_type == 'PatientBloodTest' %}
+        <div class="card mt-2">
+            <div class="card-body d-flex flex-row justify-content-between">
+                <div>
+                    <h5 class="card-title">Blood test #{{examination.id}}</h5>
+                    <p><strong>date:</strong> {{examination.date}}</p>
+                    <p><strong>alb:</strong> {{examination.alb}}</p>
+                    <p><strong>chol:</strong> {{examination.chol}}</p>
+                    <p><strong>prot:</strong> {{examination.prot}}</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>The type of my_variable is: {{ examination|variable_type }}</p>
+        <pre>{{ examination }}</pre>
+    {% endif %}
 {% empty %}
 <p>No records</p>
 {% endfor %}
 
-<a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-primary">Add phys Record</a>
-<a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-primary">Add blood Record</a>
+
+<div>
+    diagnosis here
+    <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-primary">Add diagnosis</a>
+</div>
+
+
+<div>
+    treatment here
+    <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-primary">Add treatment</a>
+</div>
 
 {% endblock %}
