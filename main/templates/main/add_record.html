@@ -24,6 +24,7 @@
             document.execCommand('copy');
             document.body.removeChild(textArea);
             alert('Text copied to clipboard!');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 </script>
