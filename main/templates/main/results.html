@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+{% block title %}List of Patients{% endblock %}
+{% block content %}
+
+<h1>Model Results</h1>
+
+<p>Predictions:</p>
+<ul>
+    {% for prediction in predictions %}
+        <li>{{ prediction }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

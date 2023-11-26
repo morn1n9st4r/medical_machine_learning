@@ -1,3 +1,5 @@
+import os
+import pickle
 from django.shortcuts import get_object_or_404, render, redirect
 
 from main.templatetags.medicalml_extras import tag_definition
@@ -17,6 +19,7 @@ from itertools import chain
 from operator import attrgetter
 
 import datetime
+import pandas as pd
 
 @login_required(login_url='/login')
 def home(request):
@@ -183,6 +186,48 @@ def detailed_view_record(request, record_id):
         'patient_diagnoses': patient_diagnoses,
         'patient_treatments': patient_treatments,
         })
+
+
+@login_required(login_url='/login')
+def run_pkl_view(request, record_id):
+    model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfm.pkl')
+
+    with open(model_path, 'rb') as file:
+        loaded_model = pickle.load(file)
+        patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+        blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').first()
+
+        data = {
+            'Age': [patient_record.age],
+            'Sex': [patient_record.gender],
+            'ALB': [blood_test.alb if blood_test else None],
+            'ALP': [blood_test.alp if blood_test else None],
+            'ALT': [blood_test.alt if blood_test else None],
+            'AST': [blood_test.ast if blood_test else None],
+            'BIL': [blood_test.bil if blood_test else None],
+            'CHE': [blood_test.che if blood_test else None],
+            'CHOL': [blood_test.chol if blood_test else None],
+            'CREA': [blood_test.crea if blood_test else None],
+            'GGT': [blood_test.gct if blood_test else None],
+            'PROT': [blood_test.prot if blood_test else None],
+        }
+
+
+        df = pd.DataFrame(data)
+        df.loc[df["Sex"] == "M", "Sex"] = "1"
+        df.loc[df["Sex"] == "F", "Sex"] = "0"
+        predictions = loaded_model.predict(df)
+
+        print(predictions)
+
+        return render(request, 'main/results.html', {'record': patient_record, 'predictions': predictions})
+
+
+
+    
+
+
+
 
 #@login_required(login_url='/login')
 #@require_http_methods(["GET", "POST"])

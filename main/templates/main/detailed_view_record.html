@@ -25,7 +25,7 @@
 <p><strong>Primary Doctor:</strong> {{ record.primary_doctor }}</p>
 <p><strong>Notes:</strong> {{ record.notes }}</p>
 
-
+<a href="{% url 'run_pkl_view' record.pk %}">Check latest blood test</a>
 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
