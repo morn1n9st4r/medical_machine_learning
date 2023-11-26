@@ -6,6 +6,9 @@
 {% block content %}
 {{form|crispy}}
 
+
+
+
 <h2>Detailed View</h2>
 <p><strong>First Name:</strong> {{ record.first_name }}</p>
 <p><strong>Last Name:</strong> {{ record.last_name }}</p>
@@ -22,99 +25,146 @@
 <p><strong>Primary Doctor:</strong> {{ record.primary_doctor }}</p>
 <p><strong>Notes:</strong> {{ record.notes }}</p>
 
-<div>
-    <a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-primary">Add phys Record</a>
-    <a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-primary">Add blood Record</a>
-</div>
 
-{% for examination in medical_examinations %}
-    {% if examination.get_model_type == 'PatientAnalysisPhysician' %}
-    <div class="card mt-2"  id="examination_{{examination.shortened_id}}">
-        <div class="card-body d-flex flex-row justify-content-between">
-            <div>
-                <h5 class="card-title">Physician test #{{examination.shortened_id}}</h5>
-                <p><strong>date:</strong> {{examination.date}}</p>
-                <p><strong>height:</strong> {{examination.height}}</p>
-                <p><strong>weight:</strong> {{examination.weight}}</p>
-                <p><strong>Blood Pressure:</strong> {{examination.bp}}</p>
-                <p><strong>Type of pain:</strong> {{examination.type_of_pain}}</p>
-            </div>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="examination-tab" data-bs-toggle="tab" data-bs-target="#examination" type="button" role="tab" aria-controls="examination" aria-selected="true">examination</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="diagnosis-tab" data-bs-toggle="tab" data-bs-target="#diagnosis" type="button" role="tab" aria-controls="diagnosis" aria-selected="false">diagnosis</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="treatment-tab" data-bs-toggle="tab" data-bs-target="#treatment" type="button" role="tab" aria-controls="treatment" aria-selected="false">treatment</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="examination" role="tabpanel" aria-labelledby="examination-tab">
+        <div>
+            <a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-primary">Add phys Record</a>
+            <a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-primary">Add blood Record</a>
         </div>
-    </div>
-    {% elif examination.get_model_type == 'PatientBloodTest' %}
-        <div class="card mt-2" id="examination_{{examination.shortened_id}}">
-            <div class="card-body d-flex flex-row justify-content-between">
-                <div>
-                    <h5 class="card-title">Blood test #{{examination.shortened_id}}</h5>
-                    <p><strong>date:</strong> {{examination.date}}</p>
-                    <p><strong>alb:</strong> {{examination.alb}}</p>
-                    <p><strong>chol:</strong> {{examination.chol}}</p>
-                    <p><strong>prot:</strong> {{examination.prot}}</p>
-                </div>
-            </div>
-        </div>
-    {% else %}
-        <p>The type of my_variable is: {{ examination|variable_type }}</p>
-        <pre>{{ examination }}</pre>
-    {% endif %}
-{% empty %}
-    <p>No records</p>
-{% endfor %}
-<!-- record.pk == patient prim key -->
-
-<div>
-    <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-primary">Add diagnosis</a>
-
-    {% for diagnosis in patient_diagnoses %}
-        <div class="card mt-2" id="diagnosis_{{diagnosis.shortened_id}}">
-            <div class="card-body d-flex flex-row justify-content-between">
-                <div>
-                    <h5 class="card-title">Diagnosis #{{diagnosis.shortened_id}}</h5>
-                    <p><strong>date:</strong> {{diagnosis.date}}</p>
-                    <p><strong>disease_name:</strong> {{diagnosis.disease_name}}</p>
-                    <p><strong>severity:</strong> {{diagnosis.severity|tag_definition}}</p>
-                    <p><strong>tag:</strong> {{diagnosis.tags|tag_definition}}</p>
-                    <p><strong>details:</strong> {{diagnosis.details}}</p>
-                    <p><strong>examinations:</strong></p>
-                    {% for uuid in diagnosis.examinations|split_examinations %}
-                        <a href="#examination_{{uuid}}">{{ uuid }}</a>,
-                    {% endfor %}
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <button class="btn btn-info">
-                            <a href="{% url 'update_examinations' record.pk diagnosis.id %}" style="color: white; text-decoration: none;">Attach examination</a>
-                        </button>
+        <div>
+            {% for examination in medical_examinations %}
+                {% if examination.get_model_type == 'PatientAnalysisPhysician' %}
+                <div class="tab-pane fade show active">
+                    <div class="card mt-2"  id="examination_{{examination.shortened_id}}">
+                        <div class="card-body d-flex flex-row justify-content-between">
+                            <div>
+                                <h5 class="card-title">Physician test #{{examination.shortened_id}}</h5>
+                                <p><strong>date:</strong> {{examination.date}}</p>
+                                <p><strong>height:</strong> {{examination.height}}</p>
+                                <p><strong>weight:</strong> {{examination.weight}}</p>
+                                <p><strong>Blood Pressure:</strong> {{examination.bp}}</p>
+                                <p><strong>Type of pain:</strong> {{examination.type_of_pain}}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                {% elif examination.get_model_type == 'PatientBloodTest' %}
+                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                        <div class="card-body d-flex flex-row justify-content-between">
+                            <div>
+                                <h5 class="card-title">Blood test #{{examination.shortened_id}}</h5>
+                                <p><strong>date:</strong> {{examination.date}}</p>
+                                <p><strong>alb:</strong> {{examination.alb}}</p>
+                                <p><strong>chol:</strong> {{examination.chol}}</p>
+                                <p><strong>prot:</strong> {{examination.prot}}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p>The type of my_variable is: {{ examination|variable_type }}</p>
+                    <pre>{{ examination }}</pre>
+                {% endif %}
+            {% empty %}
+                <p>No records</p>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No records</p>
-    {% endfor %}
-</div>
-
-
-<div>
-    <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-primary">Add treatment</a>
-
-    {% for treatment in patient_treatments %}
-        <div class="card mt-2">
-            <div class="card-body d-flex flex-row justify-content-between">
-                <div>
-                    <h5 class="card-title">Treatment #{{treatment.shortened_id}}</h5>
-                    <p><strong>date:</strong> {{treatment.date}}</p>
-                    <p><strong>medicine:</strong> {{treatment.medicine}}</p>
-                    <p><strong>quantity:</strong> {{treatment.quantity}} {{treatment.quantity_type}} {{treatment.frequency|tag_definition}}</p>
-                    <p><strong>take:</strong> from {{treatment.start_date}} to {{treatment.finish_date}}</p>
-                    <p><strong>form:</strong> {{treatment.form|tag_definition}}</p>
-                    For diagnosis: <a href="#diagnosis_{{treatment.diagnosis}}">{{treatment.diagnosis}}</a></li>
+    </div>
+    <div class="tab-pane fade" id="diagnosis" role="tabpanel" aria-labelledby="diagnosis-tab">
+        <div>
+            <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-primary">Add diagnosis</a>
+        
+            {% for diagnosis in patient_diagnoses %}
+                <div class="card mt-2" id="diagnosis_{{diagnosis.shortened_id}}">
+                    <div class="card-body d-flex flex-row justify-content-between">
+                        <div>
+                            <h5 class="card-title">Diagnosis #{{diagnosis.shortened_id}}</h5>
+                            <p><strong>date:</strong> {{diagnosis.date}}</p>
+                            <p><strong>disease_name:</strong> {{diagnosis.disease_name}}</p>
+                            <p><strong>severity:</strong> {{diagnosis.severity|tag_definition}}</p>
+                            <p><strong>tag:</strong> {{diagnosis.tags|tag_definition}}</p>
+                            <p><strong>details:</strong> {{diagnosis.details}}</p>
+                            <p><strong>examinations:</strong></p>
+                            {% for uuid in diagnosis.examinations|split_examinations %}
+                                <a href="#examination_{{uuid}}" class="examination-link" data-uuid="{{uuid}}">{{ uuid }}</a>
+                            {% endfor %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-info">
+                                    <a href="{% url 'update_examinations' record.pk diagnosis.id %}" style="color: white; text-decoration: none;">Attach examination</a>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            {% empty %}
+                <p>No records</p>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No records</p>
-    {% endfor %}
+    </div>
+    <div class="tab-pane fade" id="treatment" role="tabpanel" aria-labelledby="treatment-tab">
+        <div>
+            <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-primary">Add treatment</a>
+        
+            {% for treatment in patient_treatments %}
+                 <div class="card mt-2">
+                    <div class="card-body d-flex flex-row justify-content-between">
+                        <div>
+                            <h5 class="card-title">Treatment #{{treatment.shortened_id}}</h5>
+                            <p><strong>date:</strong> {{treatment.date}}</p>
+                            <p><strong>medicine:</strong> {{treatment.medicine}}</p>
+                            <p><strong>quantity:</strong> {{treatment.quantity}} {{treatment.quantity_type}} {{treatment.frequency|tag_definition}}</p>
+                            <p><strong>take:</strong> from {{treatment.start_date}} to {{treatment.finish_date}}</p>
+                            <p><strong>form:</strong> {{treatment.form|tag_definition}}</p>
+                            For diagnosis: <a href="#diagnosis_{{treatment.diagnosis}}" class="diagnosis-link" data-uuid="{{treatment.diagnosis}}">{{treatment.diagnosis}}</a></li>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No records</p>
+            {% endfor %}
+        </div>
+    </div>
 </div>
+
+
+<script>
+$(document).ready(function() {
+    $('.examination-link').on('click', function(e) {
+        e.preventDefault(); 
+        var uuid = $(this).data('uuid');
+        $('#examination-tab').tab('show');
+        $('html, body').animate({
+            scrollTop: $('#examination_' + uuid).offset().top
+        }, 500);
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.diagnosis-link').on('click', function(e) {
+            e.preventDefault();
+            var uuid = $(this).data('uuid');
+            $('#diagnosis-tab').tab('show');
+            $('html, body').animate({
+                scrollTop: $('#diagnosis_' + uuid).offset().top
+            }, 500);
+        });
+    });
+</script>
 
 {% endblock %}
