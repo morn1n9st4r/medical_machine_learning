@@ -41,8 +41,8 @@
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="examination" role="tabpanel" aria-labelledby="examination-tab">
         <div>
-            <a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-primary">Add phys Record</a>
-            <a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-primary">Add blood Record</a>
+            <a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-outline-secondary">Add phys Record</a>
+            <a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-outline-secondary">Add blood Record</a>
         </div>
         <div>
             {% for examination in medical_examinations %}
@@ -84,7 +84,7 @@
     </div>
     <div class="tab-pane fade" id="diagnosis" role="tabpanel" aria-labelledby="diagnosis-tab">
         <div>
-            <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-primary">Add diagnosis</a>
+            <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-outline-secondary">Add diagnosis</a>
         
             {% for diagnosis in patient_diagnoses %}
                 <div class="card mt-2" id="diagnosis_{{diagnosis.shortened_id}}">
@@ -117,7 +117,7 @@
     </div>
     <div class="tab-pane fade" id="treatment" role="tabpanel" aria-labelledby="treatment-tab">
         <div>
-            <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-primary">Add treatment</a>
+            <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-outline-secondary" >Add treatment</a>
         
             {% for treatment in patient_treatments %}
                  <div class="card mt-2">

@@ -21,18 +21,36 @@ from operator import attrgetter
 import datetime
 import pandas as pd
 
+from django.db import models
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
+
+
 @login_required(login_url='/login')
 def home(request):
-    records = PatientBaseRecord.objects.all()
+    query = request.GET.get('q')
 
-    # DELETION SEQUENCE
-    #if request.method == 'POST':
-    #    record_id = request.POST.get('record-id')
-    #    record = PatientBaseRecord.objects.filter(pk=record_id).first()
-    #    if record and record.author == request.user:
-    #        record.delete()
+    if query:
+        records = PatientBaseRecord.objects.filter(
+            models.Q(first_name__icontains=query) | models.Q(last_name__icontains=query)
+        )
+    else:
+        records = PatientBaseRecord.objects.all()
 
-    return render(request, 'main/home.html', {'records': records})
+
+    records_per_page = 10
+
+    paginator = Paginator(records, records_per_page)
+    page = request.GET.get('page')
+
+    try:
+        records = paginator.page(page)
+    except PageNotAnInteger:
+        records = paginator.page(1)
+    except EmptyPage:
+        records = paginator.page(paginator.num_pages)
+
+    return render(request, 'main/home.html', {'records': records, 'query': query})
 
 
 @login_required(login_url='/login')
