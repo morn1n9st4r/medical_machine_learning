@@ -23,7 +23,7 @@
             <div>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
-                        <span class="navbar-text">Logged in as {{user.username}} | {{user.pk}} | </span>
+                        <span class="navbar-text">Logged in as {{user|stringformat:"s" }} | {{user.pk}} | </span>
                         <li class="nav-item">
                             <a class="nav-link" href="/logout">Logout</a>
                         </li>

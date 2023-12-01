@@ -1,0 +1,46 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.pagination .current {
+    padding: 8px 16px;
+}
+
+.card {
+    margin-top: 15px;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.card-content {
+    margin-bottom: 10px;
+}
+
+.mb-2 {
+    margin-bottom: 10px;
+}
+
+
+.custom-doctor-card {
+
+    border: 2px solid #3498db; /* Example border color */
+    background-color: #f8f9fa; /* Example background color */
+}

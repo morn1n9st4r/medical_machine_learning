@@ -6,40 +6,70 @@
 {% block content %}
 {{form|crispy}}
 
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'main/style.css' %}">
+
+
+
 <h2>Detailed View</h2>
 
-{% if status == 'doctor' or status == 'patient'%}
-    <a href="{% url 'edit_record' record.pk %}">Edit</a>
-{% endif %}
+<div class="card-body">
+    {% if status == 'doctor' or status == 'patient' %}
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-outline-secondary" href="{% url 'edit_record' record.pk %}">Edit</a>
+        </div>
+    {% endif %}
+</div>
 
 
-
-<p><strong>First Name:</strong> {{ record.first_name }}</p>
-<p><strong>Last Name:</strong> {{ record.last_name }}</p>
-<p><strong>Age:</strong> {{ record.age }}</p>
-<p><strong>Date of Birth:</strong> {{ record.date_of_birth }}</p>
-<p><strong>Gender:</strong> {{ record.gender|tag_definition }}</p>
-<p><strong>Contact Number:</strong> {{ record.contact_number }}</p>
-<p><strong>Emergency Contact Number:</strong> {{ record.emergency_contact_number }}</p>
-<p><strong>Emergency Contact First Name:</strong> {{ record.emergency_contact_first_name }}</p>
-<p><strong>Emergency Contact Last Name:</strong> {{ record.emergency_contact_last_name }}</p>
-<p><strong>Emergency Contact Relationship:</strong> {{ record.emergency_contact_relationship }}</p>
-<p><strong>Allergies:</strong> {{ record.allergies }}</p>
-<p><strong>Chronic Diseases:</strong> {{ record.chronic_diseases }}</p>
-<p><strong>Primary Doctor:</strong> {{ record.primary_doctor }}</p>
-<p><strong>Notes:</strong> {{ record.notes }}</p>
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">{{ record.first_name }} {{ record.last_name }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong class="text-primary">Age:</strong> {{ record.age }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Date of Birth:</strong> {{ record.date_of_birth }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Gender:</strong> {{ record.gender|tag_definition }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Contact Number:</strong> {{ record.contact_number }}</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">                    
+                    <li class="list-group-item"><strong class="text-primary">Emergency Contact Number:</strong> {{ record.emergency_contact_number }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Emergency Contact Relationship:</strong> {{ record.emergency_contact_relationship }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Emergency Contact First Name:</strong> {{ record.emergency_contact_first_name }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Emergency Contact Last Name:</strong> {{ record.emergency_contact_last_name }}</li>
+                    </ul>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong class="text-primary">Allergies:</strong> {{ record.allergies }}</li>
+                <li class="list-group-item"><strong class="text-primary">Chronic Diseases:</strong> {{ record.chronic_diseases }}</li>
+                <li class="list-group-item"><strong class="text-primary">Primary Doctor:</strong> {{ record.primary_doctor }}</li>
+                <li class="list-group-item"><strong class="text-primary">Notes:</strong> {{ record.notes }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
 <a href="{% url 'run_pkl_view' record.pk %}">Check latest blood test</a>
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="examination-tab" data-bs-toggle="tab" data-bs-target="#examination" type="button" role="tab" aria-controls="examination" aria-selected="true">examination</button>
+<ul class="nav nav-tabs d-flex" id="myTab" role="tablist">
+    <li class="nav-item  flex-grow-1"   role="presentation">
+      <button class="nav-link active w-100"  id="examination-tab" data-bs-toggle="tab" data-bs-target="#examination" type="button" role="tab" aria-controls="examination" aria-selected="true">examination</button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="diagnosis-tab" data-bs-toggle="tab" data-bs-target="#diagnosis" type="button" role="tab" aria-controls="diagnosis" aria-selected="false">diagnosis</button>
+    <li class="nav-item flex-grow-1" role="presentation">
+      <button class="nav-link w-100"  id="diagnosis-tab" data-bs-toggle="tab" data-bs-target="#diagnosis" type="button" role="tab" aria-controls="diagnosis" aria-selected="false">diagnosis</button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="treatment-tab" data-bs-toggle="tab" data-bs-target="#treatment" type="button" role="tab" aria-controls="treatment" aria-selected="false">treatment</button>
+    <li class="nav-item flex-grow-1"  role="presentation">
+      <button class="nav-link w-100"  id="treatment-tab" data-bs-toggle="tab" data-bs-target="#treatment" type="button" role="tab" aria-controls="treatment" aria-selected="false">treatment</button>
     </li>
 </ul>
 <div class="tab-content" id="myTabContent">
@@ -54,15 +84,23 @@
             {% for examination in medical_examinations %}
                 {% if examination.get_model_type == 'PatientAnalysisPhysician' %}
                 <div class="tab-pane fade show active">
-                    <div class="card mt-2"  id="examination_{{examination.shortened_id}}">
-                        <div class="card-body d-flex flex-row justify-content-between">
-                            <div>
-                                <h5 class="card-title">Physician test #{{examination.shortened_id}}</h5>
-                                <p><strong>date:</strong> {{examination.date}}</p>
-                                <p><strong>height:</strong> {{examination.height}}</p>
-                                <p><strong>weight:</strong> {{examination.weight}}</p>
-                                <p><strong>Blood Pressure:</strong> {{examination.bp}}</p>
-                                <p><strong>Type of pain:</strong> {{examination.type_of_pain}}</p>
+                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                        <div class="card-body">
+                            <h5 class="card-title">Physician Test #{{examination.shortened_id}}</h5>
+                            <div class="mb-2">
+                                <strong>Date:</strong> {{examination.date}}
+                            </div>
+                            <div class="mb-2">
+                                <strong>Height:</strong> {{examination.height}}
+                            </div>
+                            <div class="mb-2">
+                                <strong>Weight:</strong> {{examination.weight}}
+                            </div>
+                            <div class="mb-2">
+                                <strong>Blood Pressure:</strong> {{examination.bp}}
+                            </div>
+                            <div class="mb-2">
+                                <strong>Type of Pain:</strong> {{examination.type_of_pain}}
                             </div>
                         </div>
                     </div>
@@ -111,9 +149,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 {% if status == 'doctor' %}
-                                <button class="btn btn-info">
-                                    <a href="{% url 'update_examinations' record.pk diagnosis.id %}" style="color: white; text-decoration: none;">Attach examination</a>
-                                </button>
+                                    <a href="{% url 'update_examinations' record.pk diagnosis.id %}" class="btn btn-outline-secondary">Attach examination</a>
                                 {% endif %}
                             </div>
                         </div>

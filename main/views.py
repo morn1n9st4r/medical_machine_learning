@@ -9,7 +9,7 @@ from .forms import RecordForm, RegisterForm
 from django.contrib.auth import login, logout, authenticate
 
 from .forms import PhysicianForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
-from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
+from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
 from django.contrib.auth.models import User
 
 from django.views.generic.edit import UpdateView
@@ -62,6 +62,7 @@ def custom_login_redirect(request):
 @login_required(login_url='/login')
 def home(request):
     if check_user_login(request) == 'doctor':
+        doctor = DoctorBaseRecord.objects.filter(doctor=request.user).first()
         query = request.GET.get('q')
         if query:
             records = PatientBaseRecord.objects.filter(
@@ -82,7 +83,7 @@ def home(request):
         except EmptyPage:
             records = paginator.page(paginator.num_pages)
 
-        return render(request, 'main/home.html', {'records': records, 'query': query})
+        return render(request, 'main/home.html', {'records': records, 'query': query, 'doctor': doctor})
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))   
 
