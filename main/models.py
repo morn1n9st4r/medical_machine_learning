@@ -131,3 +131,16 @@ class PatientTreatment(MedicalRecordsABC):
     
     def get_model_type(self):
         return "PatientDiagnosis"
+
+
+class ModelPrediction(models.Model):
+    id = models.AutoField(primary_key=True)
+    patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
+    modelname = models.CharField(max_length=255)
+    time = models.DateTimeField(auto_now_add=True)
+    predicted_class = models.CharField(max_length=255)
+    class_text = models.TextField()
+    certainty = models.FloatField()
+
+    def __str__(self):
+        return f"Prediction #{self.id} - Model: {self.modelname}, Class: {self.predicted_class}, Certainty: {self.certainty}%"

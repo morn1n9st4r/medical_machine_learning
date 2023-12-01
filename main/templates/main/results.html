@@ -5,10 +5,8 @@
 <h1>Model Results</h1>
 
 <p>Predictions:</p>
-<ul>
-    {% for prediction in predictions %}
-        <li>{{ prediction }}</li>
-    {% endfor %}
-</ul>
+<div>{{ prediction.predicted_class_num.0 }}</div>
+<div>{{ prediction.predicted_class_text.0 }}</div>
+<div>{{ prediction.predictions_proba.0 }}</div>
 
 {% endblock %}

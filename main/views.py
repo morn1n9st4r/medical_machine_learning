@@ -9,7 +9,7 @@ from .forms import RecordForm, RegisterForm
 from django.contrib.auth import login, logout, authenticate
 
 from .forms import PhysicianForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
-from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
+from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment, ModelPrediction
 from django.contrib.auth.models import User
 
 from django.views.generic.edit import UpdateView
@@ -269,11 +269,14 @@ def detailed_view_record(request, record_id):
 
         patient_treatments = PatientTreatment.objects.filter(patient=patient_record.pk)
 
+        model_predictions = ModelPrediction.objects.filter(patient=patient_record.pk)
+
         return render(request, 'main/detailed_view_record.html', {
             'record': patient_record,
             'medical_examinations': medical_examinations,
             'patient_diagnoses': patient_diagnoses,
             'patient_treatments': patient_treatments,
+            'model_predictions': model_predictions,
             'status': status
             })
     else:
@@ -310,11 +313,37 @@ def run_pkl_view(request, record_id):
             df = pd.DataFrame(data)
             df.loc[df["Sex"] == "M", "Sex"] = "1"
             df.loc[df["Sex"] == "F", "Sex"] = "0"
-            predictions = loaded_model.predict(df)
+            predicted_class = loaded_model.predict(df)
+            predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
+
+            reverse_mapping = {
+                "0": "Blood Donor",
+                "1": "suspect Blood Donor",
+                "2": "Hepatitis",
+                "3": "Fibrosis",
+                "4": "Cirrhosis"
+            }
+
+            predicted_class = loaded_model.predict(df)
+            predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
+
+            predictions = {
+                'predicted_class_num':predicted_class,
+                'predicted_class_text':predicted_class_reversed,
+                'predictions_proba':predictions_proba
+            }
+
+            ModelPrediction.objects.create(
+                patient = patient_record,
+                modelname = model_path,
+                time = datetime.datetime.now(),
+                predicted_class = predicted_class,
+                class_text = predicted_class_reversed,
+                certainty = predictions_proba
+            )
 
             print(predictions)
-
-            return render(request, 'main/results.html', {'record': patient_record, 'predictions': predictions})
+            return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
 
