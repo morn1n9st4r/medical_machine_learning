@@ -111,15 +111,27 @@ def home(request):
 
 def get_form_class(test_type):
     form_classes = {
-        'physician': PhysicianForm,
-        'blood_test': BloodTestForm,
+        'PatientPhysician': PhysicianForm,
+        'PatientBlood': BloodTestForm,
 
-        'diagnosis': DiagnosisForm,
-        'treatment': TreatmentForm,
+        'PatientDiagnosis': DiagnosisForm,
+        'PatientTreatment': TreatmentForm,
     }
     
     return form_classes.get(test_type, PhysicianForm) 
 
+from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
+
+def get_model_class(model_name):
+    form_classes = {
+        'PatientPhysician': PatientAnalysisPhysician,
+        'PatientBlood': PatientBloodTest,
+        'PatientDiagnosis': PatientDiagnosis,
+        'PatientTreatment': PatientTreatment,
+        'PatientBaseRecord': PatientBaseRecord
+    }
+    
+    return form_classes.get(model_name, PatientBaseRecord) 
 
 
 
@@ -224,7 +236,7 @@ def detailed_view_record(request, record_id):
 
 @login_required(login_url='/login')
 @require_http_methods(["GET", "POST"])
-def edit_record(request, record_id):
+def edit_profile(request, record_id):
     """
     Renders the edit record page for a patient and handles the form submission.
 
@@ -255,8 +267,31 @@ def edit_record(request, record_id):
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
     
+@login_required(login_url='/login')
+def edit_record(request, record_id, exam_type, id):
+    
+    record = get_object_or_404(get_model_class(exam_type), pk=id)
+    form_class = get_form_class(exam_type)
+
+    if request.method == "POST":
+        form = form_class(request.POST, instance=record)
+        if form.is_valid():
+            record = form.save(commit=False)
+            record.save()
+            return redirect('detailed_view_record', record_id=record_id)  # Replace with the appropriate success URL
+    else:
+        form = form_class(instance=record)
+    return render(request, "main/edit_record.html", {"form": form, "record": record})
 
 
+
+@login_required(login_url='/login')
+def delete_record(request, record_id, exam_type, id):
+    record = get_object_or_404(get_model_class(exam_type), id=id)
+    if request.method == 'POST':
+        record.delete()
+        return redirect('detailed_view_record', record_id=record_id)  
+    return redirect('detailed_view_record', record_id=record_id)
 
 
 @login_required(login_url='/login')
