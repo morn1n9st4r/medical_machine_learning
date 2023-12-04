@@ -88,6 +88,9 @@
                     <div class="dropdown-menu">
                       <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientPhysician' %}">Add Physician Record</a>
                       <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientBlood' %}">Add Blood Record</a>
+                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientThyroid' %}">Add Thyroid Record</a>
+                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientDermatology' %}">Add Dermatology Record</a>
+                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientBodyFat' %}">Add Body Measures Record</a>
                     </div>
                 </div>
             {% endif %}
@@ -147,6 +150,87 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>prot:</strong> {{examination.prot}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif examination.get_model_type == 'PatientThyroidTest' %}
+                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">Thyroid test #{{examination.shortened_id}}</h5>
+                                <div class="d-flex  justify-content-end align-items-center">
+                                    <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientThyroid' examination.id %}">edit</a>
+                                    <form method="post" action="{% url 'delete_record' record.id 'PatientThyroid' examination.id %}" onsubmit="return confirm('Are you sure you want to delete this examination?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger">Delete Record</button>
+                                    </form>     
+                                </div>  
+                                <div class="mb-2">
+                                    <strong>date:</strong> {{examination.date}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>ths:</strong> {{examination.ths}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>t3:</strong> {{examination.t3}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>tt4:</strong> {{examination.tt4}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif examination.get_model_type == 'PatientDermatologyTest' %}
+                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">Dermatology test #{{examination.shortened_id}}</h5>
+                                <div class="d-flex  justify-content-end align-items-center">
+                                    <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientDermatology' examination.id %}">edit</a>
+                                    <form method="post" action="{% url 'delete_record' record.id 'PatientDermatology' examination.id %}" onsubmit="return confirm('Are you sure you want to delete this examination?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger">Delete Record</button>
+                                    </form>     
+                                </div>  
+                                <div class="mb-2">
+                                    <strong>date:</strong> {{examination.date}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>scaling:</strong> {{examination.scaling|tag_definition }}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>definite_borders:</strong> {{examination.definite_borders|tag_definition }}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>itching:</strong> {{examination.itching|tag_definition }}
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                {% elif examination.get_model_type == 'PatientBodyFatTest' %}
+                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">Body measures test #{{examination.shortened_id}}</h5>
+                                <div class="d-flex  justify-content-end align-items-center">
+                                    <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientBodyFat' examination.id %}">edit</a>
+                                    <form method="post" action="{% url 'delete_record' record.id 'PatientBodyFat' examination.id %}" onsubmit="return confirm('Are you sure you want to delete this examination?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger">Delete Record</button>
+                                    </form>     
+                                </div>  
+                                <div class="mb-2">
+                                    <strong>date:</strong> {{examination.date}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>height:</strong> {{examination.height}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>weight:</strong> {{examination.weight}}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>chest_circ:</strong> {{examination.chest_circ}}
                                 </div>
                             </div>
                         </div>

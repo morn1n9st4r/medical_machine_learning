@@ -5,11 +5,11 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 
 from main.templatetags.medicalml_extras import tag_definition
-from .forms import RecordForm, RegisterForm
+from .forms import BodyFatTestForm, DermatologyTestForm, RecordForm, RegisterForm, ThyroidTestForm
 from django.contrib.auth import login, logout, authenticate
 
 from .forms import PhysicianForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
-from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment, ModelPrediction
+from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment, ModelPrediction
 from django.contrib.auth.models import User
 
 from django.views.generic.edit import UpdateView
@@ -87,7 +87,7 @@ def home(request):
         query = request.GET.get('q')
         if query:
             records = PatientBaseRecord.objects.filter(
-                models.Q(first_name__icontains=query) | models.Q(last_name__icontains=query)
+                models.Q(first_name__icontains=query) | models.Q(last_name__icontains=query) | models.Q(id__icontains=query)
             )
         else:
             records = PatientBaseRecord.objects.all()
@@ -113,6 +113,9 @@ def get_form_class(test_type):
     form_classes = {
         'PatientPhysician': PhysicianForm,
         'PatientBlood': BloodTestForm,
+        'PatientThyroid': ThyroidTestForm,
+        'PatientDermatology': DermatologyTestForm,
+        'PatientBodyFat': BodyFatTestForm,
 
         'PatientDiagnosis': DiagnosisForm,
         'PatientTreatment': TreatmentForm,
@@ -128,7 +131,10 @@ def get_model_class(model_name):
         'PatientBlood': PatientBloodTest,
         'PatientDiagnosis': PatientDiagnosis,
         'PatientTreatment': PatientTreatment,
-        'PatientBaseRecord': PatientBaseRecord
+        'PatientBaseRecord': PatientBaseRecord,
+        'PatientThyroid': PatientThyroidTest,
+        'PatientDermatology': PatientDermatologyTest,
+        'PatientBodyFat': PatientBodyFatTest
     }
     
     return form_classes.get(model_name, PatientBaseRecord) 
@@ -210,7 +216,11 @@ def detailed_view_record(request, record_id):
 
         physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
         blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
-        unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
+        thyroid_tests = PatientThyroidTest.objects.filter(patient=patient_record.pk)
+        derm_tests = PatientDermatologyTest.objects.filter(patient=patient_record.pk)
+        bodyfat_tests = PatientBodyFatTest.objects.filter(patient=patient_record.pk)
+        unsorted_medical_examinations = list(chain(physician_examinations, blood_tests,
+                                                   thyroid_tests, derm_tests, bodyfat_tests))
         medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
 
         patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
@@ -314,7 +324,7 @@ def add_record(request, record_id, test_type):
     """
     if check_user_page(request, record_id) == 'doctor':
         patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
-        current_user = get_object_or_404(User, pk=request.user.pk)
+        current_user = get_object_or_404(DoctorBaseRecord, pk=request.user.pk)
 
         form_class = get_form_class(test_type)
 

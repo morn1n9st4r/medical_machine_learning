@@ -20,7 +20,7 @@ def variable_type(value):
 
 @register.filter(name='tag_definition')
 def tag_definition(value):
-    dictionary = list(set().union(GENDER_CHOICES, TAGS_CHOICES, SEVERITY_CHOICES, FORM_CHOICES, FREQUENCY_CHOICES))
+    dictionary = list(set().union(GENDER_CHOICES, TAGS_CHOICES, SEVERITY_CHOICES, FORM_CHOICES, FREQUENCY_CHOICES, DERMATOLOGY_CHOICES))
     return dict(dictionary).get(value, value)
 
 @register.filter(name='split_examinations')

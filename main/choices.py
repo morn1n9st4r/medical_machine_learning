@@ -12,6 +12,13 @@ SEVERITY_CHOICES = [
     ('CR', 'Critical'),
 ]
 
+DERMATOLOGY_CHOICES = [
+    ('0', 'None'),
+    ('1', 'Mild'),
+    ('2', 'Moderate'),
+    ('3', 'Severe'),
+]
+
 TAGS_CHOICES = [
     ('AD', 'Autoimmune Disorder'),
     ('GD', 'Genetic Disorder'),

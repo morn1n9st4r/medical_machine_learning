@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
+from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment
 import uuid
 from bootstrap_datepicker_plus.widgets import DatePickerInput
 
@@ -28,24 +28,63 @@ class RecordForm(forms.ModelForm):
 class PhysicianForm(forms.ModelForm):
     class Meta:
         model = PatientAnalysisPhysician
-        fields = ['type_of_pain','bp','restbp','maxhr','height','weight']
-
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
 
 class BloodTestForm(forms.ModelForm):
     class Meta:
         model = PatientBloodTest
-        fields = ['alb', 'alp', 'alt', 'ast', 'bil', 'bg', 'che', 'chol', 'crea', 'gct', 'prot']
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
+
+class ThyroidTestForm(forms.ModelForm):
+    class Meta:
+        model = PatientThyroidTest
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
+
+
+
+from django.db import models
+
+class DermatologyTestForm(forms.ModelForm):
+    class Meta:
+        model = PatientDermatologyTest
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+
+        for field_name, field in self.fields.items():
+            if isinstance(field, models.PositiveIntegerField):
+                value = cleaned_data.get(field_name)
+                if value is None or value == '':
+                    # Set empty values to 0
+                    cleaned_data[field_name] = 0
+
+        cleaned_data = super().clean()
+
+        return cleaned_data
+
+class BodyFatTestForm(forms.ModelForm):
+    class Meta:
+        model = PatientBodyFatTest
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
 
 
 class DiagnosisForm(forms.ModelForm):
     class Meta:
         model = PatientDiagnosis
-        fields = ['disease_name', 'severity', 'tags', 'details']
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
 
 class TreatmentForm(forms.ModelForm):
     class Meta:
         model = PatientTreatment
-        fields = ['medicine', 'quantity', 'quantity_type', 'frequency', 'start_date', 'finish_date', 'form', 'diagnosis']
+        fields = "__all__"
+        exclude = ['id', 'patient', 'doctor', 'date']
 
 class ExaminationsForm(forms.ModelForm):
     class Meta:
