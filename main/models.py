@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .choices import *
 
+from auditlog.registry import auditlog
+
 class PatientBaseRecord(models.Model):
     id = models.AutoField(primary_key=True)
     patient = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -144,3 +146,13 @@ class ModelPrediction(models.Model):
 
     def __str__(self):
         return f"Prediction #{self.id} - Model: {self.modelname}, Class: {self.predicted_class}, Certainty: {self.certainty}%"
+
+
+
+auditlog.register(PatientBaseRecord, serialize_data=True)
+auditlog.register(DoctorBaseRecord, serialize_data=True)
+auditlog.register(PatientAnalysisPhysician, serialize_data=True)
+auditlog.register(PatientBloodTest, serialize_data=True)
+auditlog.register(PatientDiagnosis, serialize_data=True)
+auditlog.register(PatientTreatment, serialize_data=True)
+auditlog.register(ModelPrediction, serialize_data=True)

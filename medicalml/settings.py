@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'bootstrap_datepicker_plus',
     'django_forms_bootstrap',
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    'auditlog'
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS ="bootstrap5"
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'auditlog.middleware.AuditlogMiddleware'
 ]
 
 ROOT_URLCONF = 'medicalml.urls'
