@@ -81,8 +81,15 @@
     <div class="tab-pane fade show active" id="examination" role="tabpanel" aria-labelledby="examination-tab">
         <div>
             {% if status == 'doctor' %}
-                <a href="{% url 'add_record' record.pk 'physician' %}" class="btn btn-outline-secondary">Add phys Record</a>
-                <a href="{% url 'add_record' record.pk 'blood_test' %}" class="btn btn-outline-secondary">Add blood Record</a>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Add Record
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'physician' %}">Add Physician Record</a>
+                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'blood_test' %}">Add Blood Record</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
         <div>
@@ -192,7 +199,14 @@
     {% if status == 'doctor'%}
     <div class="tab-pane fade" id="machinelearning" role="tabpanel" aria-labelledby="machinelearning-tab">
         <div>
-            <a class="btn btn-outline-secondary" href="{% url 'run_pkl_view' record.pk %}">Check latest blood test</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select model
+                </button>
+                <div class="dropdown-menu">
+                    <a class="btn btn-outline-secondary" href="{% url 'run_pkl_view' record.pk %}">Check latest blood test</a>
+                </div>
+            </div>
             {% for prediction in model_predictions %}
                 <div class="card mt-2">
                     <div class="card-body d-flex flex-row justify-content-between">

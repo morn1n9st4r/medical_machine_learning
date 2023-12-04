@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
 import uuid
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 
 class RegisterForm(UserCreationForm):
     
@@ -19,6 +20,9 @@ class RecordForm(forms.ModelForm):
         fields = ['first_name','last_name','age','date_of_birth','gender','contact_number',
                 'emergency_contact_number','emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_relationship',
                 'allergies', 'chronic_diseases', 'primary_doctor', 'notes']
+        widgets = {
+            "date_of_birth": DatePickerInput()
+        }
 
 
 class PhysicianForm(forms.ModelForm):

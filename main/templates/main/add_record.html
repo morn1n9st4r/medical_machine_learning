@@ -3,6 +3,21 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
+<div class="alert alert-success alert-dismissible fade show" role="alert" id="copyAlert" style="display: none;">
+    Text copied to clipboard!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<form method="post">
+    {% csrf_token %}{{form|crispy}}
+    <button type="submit" class="btn btn-success">Submit</button>
+</form>
+
+<div id="dynamicContent">
+    {{ dynamic_html_content | safe }}
+</div>
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var dynamicContent = document.getElementById('dynamicContent');
@@ -23,20 +38,11 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            alert('Text copied to clipboard!');
+            var copyAlert = document.getElementById('copyAlert');
+            copyAlert.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 </script>
-
-
-<form method="post">
-    {% csrf_token %}{{form|crispy}}
-    <button type="submit" class="btn btn-success">Submit</button>
-</form>
-
-<div id="dynamicContent">
-    {{ dynamic_html_content | safe }}
-</div>
 
 {% endblock %}

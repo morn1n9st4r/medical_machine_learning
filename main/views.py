@@ -50,6 +50,17 @@ def check_user_login(req):
 
 @login_required(login_url='/login')
 def custom_login_redirect(request):
+    """
+    Redirects the user based on their authentication status and role.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        Redirects the user to the home page if they are a doctor.
+        Redirects the user to their detailed record view if they are not a doctor.
+        Redirects unauthenticated users to the login page.
+    """
     if request.user.is_authenticated:
         if check_user_login(request) == 'doctor':
             return redirect(reverse('home'))
@@ -61,6 +72,16 @@ def custom_login_redirect(request):
 
 @login_required(login_url='/login')
 def home(request):
+    """
+    Renders the home page with a list of patient records for doctors.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        A rendered HTML template with patient records, search query, and doctor information.
+        Or, returns a forbidden response if the logged-in user is not a doctor.
+    """
     if check_user_login(request) == 'doctor':
         doctor = DoctorBaseRecord.objects.filter(doctor=request.user).first()
         query = request.GET.get('q')
@@ -88,8 +109,174 @@ def home(request):
         return HttpResponseForbidden(render(request, 'main/403.html'))   
 
 
+def get_form_class(test_type):
+    form_classes = {
+        'physician': PhysicianForm,
+        'blood_test': BloodTestForm,
+
+        'diagnosis': DiagnosisForm,
+        'treatment': TreatmentForm,
+    }
+    
+    return form_classes.get(test_type, PhysicianForm) 
+
+
+
+
+def sign_up(request):
+    """
+    Handles user registration and creates a corresponding PatientBaseRecord.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        If the request method is POST and the form is valid:
+            Creates a new user and a corresponding PatientBaseRecord.
+            Logs in the user.
+            Redirects to the detailed view record page for the newly created user.
+        If the request method is GET or the form is not valid:
+            Renders the sign-up form.
+
+    """
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=True)
+            PatientBaseRecord.objects.create(
+                id=user.id,
+                patient = get_object_or_404(User, pk=user.id),
+                first_name='first_name',
+                last_name='last_name',
+                age=18,
+                date_of_birth=datetime.datetime.now(),
+                gender='M',
+                contact_number='380947100983',
+                emergency_contact_number='380947100983',
+                emergency_contact_first_name='emergency_contact_first_name',
+                emergency_contact_last_name='emergency_contact_last_name',
+                emergency_contact_relationship='emergency_contact_relationship',
+                allergies='allergies',
+                chronic_diseases='chronic_diseases',
+                primary_doctor='primary_doctor',
+                notes='notes',
+            )
+            login(request, user)
+            return redirect(reverse('detailed_view_record', args=[user.id]))
+    else:
+        form = RegisterForm()
+
+    return render(request, 'registration/sign_up.html', {'form': form})
+
+
+
+
+
+@login_required(login_url='/login')
+def detailed_view_record(request, record_id):
+    """
+    Renders the detailed view record page for a patient.
+
+    Args:
+        request: The HTTP request object.
+        record_id: The ID of the patient's record.
+
+    Returns:
+        If the user has the correct permissions:
+            Renders the detailed view record page with information about the patient,
+            medical examinations, diagnoses, treatments, and model predictions.
+        If the user does not have the correct permissions:
+            Renders the forbidden page.
+
+    """
+    if check_user_page(request, record_id)  == 'doctor' or check_user_page(request, record_id) == 'patient':
+
+        status = check_user_page(request, record_id)
+
+        patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+
+        physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
+        blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
+        unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
+        medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
+
+        patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
+
+        patient_treatments = PatientTreatment.objects.filter(patient=patient_record.pk)
+
+        model_predictions = ModelPrediction.objects.filter(patient=patient_record.pk)
+
+        return render(request, 'main/detailed_view_record.html', {
+            'record': patient_record,
+            'medical_examinations': medical_examinations,
+            'patient_diagnoses': patient_diagnoses,
+            'patient_treatments': patient_treatments,
+            'model_predictions': model_predictions,
+            'status': status
+            })
+    else:
+        return HttpResponseForbidden(render(request, 'main/403.html'))  
+
+
+
+
+
+@login_required(login_url='/login')
+@require_http_methods(["GET", "POST"])
+def edit_record(request, record_id):
+    """
+    Renders the edit record page for a patient and handles the form submission.
+
+    Args:
+        request: The HTTP request object.
+        record_id: The ID of the patient's record.
+
+    Returns:
+        If the user has the correct permissions:
+            - GET: Renders the edit record page with the pre-filled form.
+            - POST: Processes the form submission, updates the record, and redirects to the home page.
+        If the user does not have the correct permissions:
+            Renders the forbidden page.
+
+    """
+    if check_user_page(request, record_id) == 'doctor' or check_user_page(request, record_id)  == 'patient':
+        record = get_object_or_404(PatientBaseRecord, pk=record_id)
+
+        if request.method == "POST":
+            form = RecordForm(request.POST, instance=record)
+            if form.is_valid():
+                form.save()
+                return redirect('/home')  # Replace with the appropriate success URL
+        else:
+            form = RecordForm(instance=record)
+
+        return render(request, "main/edit_record.html", {"form": form, "record": record})
+    else:
+        return HttpResponseForbidden(render(request, 'main/403.html'))    
+    
+
+
+
+
 @login_required(login_url='/login')
 def add_record(request, record_id, test_type):
+    """
+    Renders the add record page for a doctor and handles the form submission.
+
+    Args:
+        request: The HTTP request object.
+        record_id: The ID of the patient's record.
+        test_type: The type of medical test or treatment to add.
+
+    Returns:
+        If the user is a doctor:
+            - GET: Renders the add record page with the appropriate form.
+            - POST: Processes the form submission, creates the medical record, and redirects to the detailed view page.
+        If the user is not a doctor:
+            Renders the forbidden page.
+
+    """
     if check_user_page(request, record_id) == 'doctor':
         patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
         current_user = get_object_or_404(User, pk=request.user.pk)
@@ -139,6 +326,22 @@ def add_record(request, record_id, test_type):
 
 @login_required(login_url='/login')
 def update_examinations(request, record_id, diagnosis_id):
+    """
+    Renders the page for updating examinations attached to a patient's diagnosis
+    and handles the form submission.
+
+    Args:
+        request: The HTTP request object.
+        record_id: The ID of the patient's record.
+        diagnosis_id: The ID of the patient's diagnosis.
+
+    Returns:
+        If the user is a doctor:
+            - GET: Renders the update examinations page with the appropriate form and available medical examinations.
+            - POST: Processes the form submission, updates the examinations, and redirects to the detailed view page.
+        If the user is not a doctor:
+            Renders the forbidden page.
+    """
     if check_user_page(request, record_id)  == 'doctor':
         patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
         patient_diagnosis = get_object_or_404(PatientDiagnosis, pk=diagnosis_id)
@@ -204,85 +407,6 @@ def update_examinations(request, record_id, diagnosis_id):
 
 
 
-def get_form_class(test_type):
-    form_classes = {
-        'physician': PhysicianForm,
-        'blood_test': BloodTestForm,
-
-        'diagnosis': DiagnosisForm,
-        'treatment': TreatmentForm,
-    }
-    
-    return form_classes.get(test_type, PhysicianForm) 
-
-
-
-
-def sign_up(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=True)
-            PatientBaseRecord.objects.create(
-                id=user.id,
-                patient = get_object_or_404(User, pk=user.id),
-                first_name='first_name',
-                last_name='last_name',
-                age=18,
-                date_of_birth=datetime.datetime.now(),
-                gender='M',
-                contact_number='380947100983',
-                emergency_contact_number='380947100983',
-                emergency_contact_first_name='emergency_contact_first_name',
-                emergency_contact_last_name='emergency_contact_last_name',
-                emergency_contact_relationship='emergency_contact_relationship',
-                allergies='allergies',
-                chronic_diseases='chronic_diseases',
-                primary_doctor='primary_doctor',
-                notes='notes',
-            )
-            login(request, user)
-            return redirect(reverse('detailed_view_record', args=[user.id]))
-    else:
-        form = RegisterForm()
-
-    return render(request, 'registration/sign_up.html', {'form': form})
-
-
-
-
-
-@login_required(login_url='/login')
-def detailed_view_record(request, record_id):
-    if check_user_page(request, record_id)  == 'doctor' or check_user_page(request, record_id) == 'patient':
-
-        status = check_user_page(request, record_id)
-
-        patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
-
-        physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
-        blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
-        unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
-        medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
-
-        patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
-
-        patient_treatments = PatientTreatment.objects.filter(patient=patient_record.pk)
-
-        model_predictions = ModelPrediction.objects.filter(patient=patient_record.pk)
-
-        return render(request, 'main/detailed_view_record.html', {
-            'record': patient_record,
-            'medical_examinations': medical_examinations,
-            'patient_diagnoses': patient_diagnoses,
-            'patient_treatments': patient_treatments,
-            'model_predictions': model_predictions,
-            'status': status
-            })
-    else:
-        return HttpResponseForbidden(render(request, 'main/403.html'))  
-
-
 
 
 @login_required(login_url='/login')
@@ -344,25 +468,5 @@ def run_pkl_view(request, record_id):
 
             print(predictions)
             return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
-    else:
-        return HttpResponseForbidden(render(request, 'main/403.html'))    
-
-
-
-@login_required(login_url='/login')
-@require_http_methods(["GET", "POST"])
-def edit_record(request, record_id):
-    if check_user_page(request, record_id) == 'doctor' or check_user_page(request, record_id)  == 'patient':
-        record = get_object_or_404(PatientBaseRecord, pk=record_id)
-
-        if request.method == "POST":
-            form = RecordForm(request.POST, instance=record)
-            if form.is_valid():
-                form.save()
-                return redirect('/home')  # Replace with the appropriate success URL
-        else:
-            form = RecordForm(instance=record)
-
-        return render(request, "main/edit_record.html", {"form": form, "record": record})
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
