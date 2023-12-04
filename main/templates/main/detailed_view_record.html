@@ -86,7 +86,7 @@
                       Add Record
                     </button>
                     <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientPhysician' %}">Add Physician Record</a>
+                      <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientCardiologist' %}">Add Cardiologist Record</a>
                       <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientBlood' %}">Add Blood Record</a>
                       <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientThyroid' %}">Add Thyroid Record</a>
                       <a class="dropdown-item" href="{% url 'add_record' record.pk 'PatientDermatology' %}">Add Dermatology Record</a>
@@ -97,26 +97,20 @@
         </div>
         <div>
             {% for examination in medical_examinations %}
-                {% if examination.get_model_type == 'PatientAnalysisPhysician' %}
+                {% if examination.get_model_type == 'PatientAnalysisCardiologist' %}
                 <div class="tab-pane fade show active">
                     <div class="card mt-2" id="examination_{{examination.shortened_id}}">
                         <div class="card-body">
-                            <h5 class="card-title">Physician Test #{{examination.shortened_id}}</h5>
+                            <h5 class="card-title">Cardiologist Test #{{examination.shortened_id}}</h5>
                             <div class="d-flex  justify-content-end align-items-center">
-                                <a class="btn btn-outline-info" href="{% url 'edit_record'  record.id 'PatientPhysician' examination.id %}">edit</a>
-                                <form method="post" action="{% url 'delete_record' record.id 'PatientPhysician' examination.id %}" onsubmit="return confirm('Are you sure you want to delete this examination?');">
+                                <a class="btn btn-outline-info" href="{% url 'edit_record'  record.id 'PatientCardiologist' examination.id %}">edit</a>
+                                <form method="post" action="{% url 'delete_record' record.id 'PatientCardiologist' examination.id %}" onsubmit="return confirm('Are you sure you want to delete this examination?');">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-outline-danger">Delete Record</button>
                                 </form>     
                             </div>                           
                             <div class="mb-2">
                                 <strong>Date:</strong> {{examination.date}}
-                            </div>
-                            <div class="mb-2">
-                                <strong>Height:</strong> {{examination.height}}
-                            </div>
-                            <div class="mb-2">
-                                <strong>Weight:</strong> {{examination.weight}}
                             </div>
                             <div class="mb-2">
                                 <strong>Blood Pressure:</strong> {{examination.bp}}
@@ -324,7 +318,8 @@
                     Select model
                 </button>
                 <div class="dropdown-menu">
-                    <a class="btn btn-outline-secondary" href="{% url 'run_pkl_view' record.pk %}">Check latest blood test</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'predict_blood_view' record.pk %}">Check latest blood test</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'predict_thyroid_view' record.pk %}">Check latest thyroid test</a>
                 </div>
             </div>
             {% for prediction in model_predictions %}

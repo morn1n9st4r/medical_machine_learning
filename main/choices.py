@@ -19,6 +19,20 @@ DERMATOLOGY_CHOICES = [
     ('3', 'Severe'),
 ]
 
+CHESTPAIN_CHOICES = [
+    ('TA', 'Typical Angina'),
+    ('ATA', 'Atypical Angina'),
+    ('NAP', 'Non-Anginal Pain'),
+    ('ASY', 'Asymptomatic'),
+]
+
+
+ECG_CHOICES = [
+    ('Normal', 'Normal'),
+    ('ST', 'ST-T wave abnormality'),
+    ('LVH', 'Left ventricular hypertrophy'),
+]
+
 TAGS_CHOICES = [
     ('AD', 'Autoimmune Disorder'),
     ('GD', 'Genetic Disorder'),

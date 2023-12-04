@@ -50,7 +50,7 @@ class MedicalRecordsABC(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True)
     patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorBaseRecord, on_delete=models.CASCADE)
-    date = models.DateField()
+    date = models.DateTimeField()
     
     class Meta:
         abstract = True
@@ -64,20 +64,22 @@ class MedicalRecordsABC(models.Model):
         return shortened_hex
 
 
-class PatientAnalysisPhysician(MedicalRecordsABC):
+class PatientAnalysisCardiologist(MedicalRecordsABC):
 
-    type_of_pain = models.CharField(max_length=255)
+    type_of_pain = models.CharField(max_length=255, choices=CHESTPAIN_CHOICES)
     bp = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(300)])
     restbp = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(300)])
     maxhr = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(300)])
-    height = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
-    weight = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+    resting_ecg = models.CharField(max_length=255, choices=ECG_CHOICES)
+    excercise_angina = models.BooleanField()
+    # chol
+    # bg
 
     def __str__(self):
         return f"ID: {self.id} - Patient: {self.patient_id}, Doctor: {self.doctor_id}, Date: {self.date}"
 
     def get_model_type(self):
-        return "PatientAnalysisPhysician"
+        return "PatientAnalysisCardiologist"
 
 
 class PatientBloodTest(MedicalRecordsABC):
@@ -102,14 +104,12 @@ class PatientBloodTest(MedicalRecordsABC):
 
 class PatientThyroidTest(MedicalRecordsABC):
     
-    ths = models.FloatField()
+    tsh = models.FloatField()
     t3 = models.FloatField()
     tt4 = models.FloatField()
     t4u = models.FloatField()
     fti = models.FloatField()
-    tbg = models.FloatField()
     goitre = models.BooleanField()
-    surgeries = models.BooleanField()
 
     def __str__(self):
         return f"Thyroid Hormones Test for {self.patient} on {self.date}"
@@ -234,7 +234,7 @@ class ModelPrediction(models.Model):
 
 auditlog.register(PatientBaseRecord, serialize_data=True)
 auditlog.register(DoctorBaseRecord, serialize_data=True)
-auditlog.register(PatientAnalysisPhysician, serialize_data=True)
+auditlog.register(PatientAnalysisCardiologist, serialize_data=True)
 auditlog.register(PatientBloodTest, serialize_data=True)
 auditlog.register(PatientThyroidTest, serialize_data=True)
 auditlog.register(PatientDermatologyTest, serialize_data=True)

@@ -8,8 +8,8 @@ from main.templatetags.medicalml_extras import tag_definition
 from .forms import BodyFatTestForm, DermatologyTestForm, RecordForm, RegisterForm, ThyroidTestForm
 from django.contrib.auth import login, logout, authenticate
 
-from .forms import PhysicianForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
-from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment, ModelPrediction
+from .forms import CardiologistForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
+from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment, ModelPrediction
 from django.contrib.auth.models import User
 
 from django.views.generic.edit import UpdateView
@@ -111,7 +111,7 @@ def home(request):
 
 def get_form_class(test_type):
     form_classes = {
-        'PatientPhysician': PhysicianForm,
+        'PatientCardiologist': CardiologistForm,
         'PatientBlood': BloodTestForm,
         'PatientThyroid': ThyroidTestForm,
         'PatientDermatology': DermatologyTestForm,
@@ -121,13 +121,13 @@ def get_form_class(test_type):
         'PatientTreatment': TreatmentForm,
     }
     
-    return form_classes.get(test_type, PhysicianForm) 
+    return form_classes.get(test_type, CardiologistForm) 
 
-from .models import PatientBaseRecord, PatientAnalysisPhysician, PatientBloodTest, PatientDiagnosis, PatientTreatment
+from .models import PatientBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientDiagnosis, PatientTreatment
 
 def get_model_class(model_name):
     form_classes = {
-        'PatientPhysician': PatientAnalysisPhysician,
+        'PatientCardiologist': PatientAnalysisCardiologist,
         'PatientBlood': PatientBloodTest,
         'PatientDiagnosis': PatientDiagnosis,
         'PatientTreatment': PatientTreatment,
@@ -214,12 +214,12 @@ def detailed_view_record(request, record_id):
 
         patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
 
-        physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
+        cardiologist_examinations = PatientAnalysisCardiologist.objects.filter(patient=patient_record.pk)
         blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
         thyroid_tests = PatientThyroidTest.objects.filter(patient=patient_record.pk)
         derm_tests = PatientDermatologyTest.objects.filter(patient=patient_record.pk)
         bodyfat_tests = PatientBodyFatTest.objects.filter(patient=patient_record.pk)
-        unsorted_medical_examinations = list(chain(physician_examinations, blood_tests,
+        unsorted_medical_examinations = list(chain(cardiologist_examinations, blood_tests,
                                                    thyroid_tests, derm_tests, bodyfat_tests))
         medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
 
@@ -408,20 +408,20 @@ def update_examinations(request, record_id, diagnosis_id):
             form = ExaminationsForm()
 
             present_exams_shortened_ids = patient_diagnosis.examinations.split(", ")
-            physician_examinations = PatientAnalysisPhysician.objects.filter(patient=patient_record.pk)
+            cardiologist_examinations = PatientAnalysisCardiologist.objects.filter(patient=patient_record.pk)
             blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
-            unsorted_medical_examinations = list(chain(physician_examinations, blood_tests))
+            unsorted_medical_examinations = list(chain(cardiologist_examinations, blood_tests))
             medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
             
             filtered_medical_examinations = [exam for exam in medical_examinations if exam.shortened_id not in present_exams_shortened_ids]
             dynamic_html_content = ''
             for exam in filtered_medical_examinations:
-                if exam.get_model_type() == "PatientAnalysisPhysician":
+                if exam.get_model_type() == "PatientAnalysisCardiologist":
                     dynamic_html_content += f'''  
                         <div class="card mt-2"  id="examination_{{exam.shortened_id}}">
                             <div class="card-body d-flex flex-row justify-content-between">
                                 <div>
-                                    <h5 class="card-title">Physician test #{exam.shortened_id}</h5>
+                                    <h5 class="card-title">Cardiologist test #{exam.shortened_id}</h5>
                                     <p><strong>date:</strong> {exam.date}</p>
                                     <p><strong>height:</strong> {exam.height}</p>
                                     <p><strong>weight:</strong> {exam.weight}</p>
@@ -455,9 +455,9 @@ def update_examinations(request, record_id, diagnosis_id):
 
 
 @login_required(login_url='/login')
-def run_pkl_view(request, record_id):
+def predict_blood_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
-        model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfm.pkl')
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfm_bt.pkl')
 
         with open(model_path, 'rb') as file:
             loaded_model = pickle.load(file)
@@ -515,3 +515,123 @@ def run_pkl_view(request, record_id):
             return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
+
+
+
+@login_required(login_url='/login')
+def predict_thyroid_view(request, record_id):
+    if check_user_page(request, record_id)  == 'doctor':
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'xgb_thyroid.pkl')
+
+        with open(model_path, 'rb') as file:
+            loaded_model = pickle.load(file)
+            patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+            thyroid_test = PatientThyroidTest.objects.filter(patient=patient_record.pk).order_by('date').first()
+
+            data = {
+                'T3': [float(thyroid_test.t3) if thyroid_test else None],
+                'TSH': [float(thyroid_test.tsh) if thyroid_test else None],
+                'FTI': [float(thyroid_test.fti) if thyroid_test else None],
+                'T4U': [float(thyroid_test.t4u) if thyroid_test else None],
+                'TT4': [float(thyroid_test.tt4)if thyroid_test else None],
+                'goitre': [bool(thyroid_test.goitre) if thyroid_test else None],
+                'sex': [patient_record.gender],
+                'age': [patient_record.age],
+            }
+
+            df = pd.DataFrame(data)
+            df.replace('M', 0, inplace=True) # male mapped to 0
+            df.replace('F', 1, inplace=True) # female mapped to 1
+            predicted_class = loaded_model.predict(df)
+            predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
+
+            print(df.head())
+
+            reverse_mapping = {
+                "0": "negative",
+                "1": "hypothyroid",
+                "2": "hyperthyroid"
+            }
+
+            predicted_class = loaded_model.predict(df)
+            predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
+
+            predictions = {
+                'predicted_class_num':predicted_class,
+                'predicted_class_text':predicted_class_reversed,
+                'predictions_proba':predictions_proba
+            }
+
+            ModelPrediction.objects.create(
+                patient = patient_record,
+                modelname = model_path,
+                time = datetime.datetime.now(),
+                predicted_class = predicted_class,
+                class_text = predicted_class_reversed,
+                certainty = predictions_proba
+            )
+
+            print(predictions)
+            return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
+    else:
+        return HttpResponseForbidden(render(request, 'main/403.html'))      
+
+
+
+@login_required(login_url='/login')
+def predict_thyroid_view(request, record_id):
+    if check_user_page(request, record_id)  == 'doctor':
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'xgb_thyroid.pkl')
+
+        with open(model_path, 'rb') as file:
+            loaded_model = pickle.load(file)
+            patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+            thyroid_test = PatientThyroidTest.objects.filter(patient=patient_record.pk).order_by('date').first()
+
+            data = {
+                'T3': [float(thyroid_test.t3) if thyroid_test else None],
+                'TSH': [float(thyroid_test.tsh) if thyroid_test else None],
+                'FTI': [float(thyroid_test.fti) if thyroid_test else None],
+                'T4U': [float(thyroid_test.t4u) if thyroid_test else None],
+                'TT4': [float(thyroid_test.tt4)if thyroid_test else None],
+                'goitre': [bool(thyroid_test.goitre) if thyroid_test else None],
+                'sex': [patient_record.gender],
+                'age': [patient_record.age],
+            }
+
+            df = pd.DataFrame(data)
+            df.replace('M', 0, inplace=True)
+            df.replace('F', 1, inplace=True)
+            predicted_class = loaded_model.predict(df)
+            predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
+
+            print(df.head())
+
+            reverse_mapping = {
+                "0": "negative",
+                "1": "hypothyroid",
+                "2": "hyperthyroid"
+            }
+
+            predicted_class = loaded_model.predict(df)
+            predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
+
+            predictions = {
+                'predicted_class_num':predicted_class,
+                'predicted_class_text':predicted_class_reversed,
+                'predictions_proba':predictions_proba
+            }
+
+            ModelPrediction.objects.create(
+                patient = patient_record,
+                modelname = model_path,
+                time = datetime.datetime.now(),
+                predicted_class = predicted_class,
+                class_text = predicted_class_reversed,
+                certainty = predictions_proba
+            )
+
+            print(predictions)
+            return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
+    else:
+        return HttpResponseForbidden(render(request, 'main/403.html'))      
