@@ -8,7 +8,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<form method="post" id="myForm">
+<form method="post">
     {% csrf_token %}
     {{form|crispy}}
     <button type="submit" class="btn btn-success">Submit</button>
@@ -46,18 +46,6 @@
     });
 </script>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var form = document.getElementById('myForm');
-        form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                alert('Please correct the errors in the form.');
-            }
-        });
-    });
-</script>
 
 
 {% endblock %}

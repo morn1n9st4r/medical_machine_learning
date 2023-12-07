@@ -45,27 +45,11 @@ class ThyroidTestForm(forms.ModelForm):
 
 
 
-from django.db import models
-
 class DermatologyTestForm(forms.ModelForm):
     class Meta:
         model = PatientDermatologyTest
         fields = "__all__"
         exclude = ['id', 'patient', 'doctor', 'date']
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-
-        for field_name, field in self.fields.items():
-            if isinstance(field, models.PositiveIntegerField):
-                value = cleaned_data.get(field_name)
-                if value is None or value == '':
-                    # Set empty values to 0
-                    cleaned_data[field_name] = 0
-
-        cleaned_data = super().clean()
-
-        return cleaned_data
 
 class BodyFatTestForm(forms.ModelForm):
     class Meta:
@@ -78,7 +62,7 @@ class DiagnosisForm(forms.ModelForm):
     class Meta:
         model = PatientDiagnosis
         fields = "__all__"
-        exclude = ['id', 'patient', 'doctor', 'date']
+        exclude = ['id', 'patient', 'doctor', 'date', 'examinations']
 
 class TreatmentForm(forms.ModelForm):
     class Meta:

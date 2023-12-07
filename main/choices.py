@@ -26,12 +26,23 @@ CHESTPAIN_CHOICES = [
     ('ASY', 'Asymptomatic'),
 ]
 
+MODELTYPE_CHOICES = [
+    ('CLF', 'Classification'),
+    ('REG', 'Regression'),
+]
 
 ECG_CHOICES = [
     ('Normal', 'Normal'),
     ('ST', 'ST-T wave abnormality'),
     ('LVH', 'Left ventricular hypertrophy'),
 ]
+
+SLOPE_CHOICES = [
+    ('Up', 'Upsloping'),
+    ('Flat', 'Flat'),
+    ('Down', 'Downsloping'),
+]
+
 
 TAGS_CHOICES = [
     ('AD', 'Autoimmune Disorder'),

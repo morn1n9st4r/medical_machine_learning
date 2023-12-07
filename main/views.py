@@ -3,6 +3,7 @@ import pickle
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+import numpy as np
 
 from main.templatetags.medicalml_extras import tag_definition
 from .forms import BodyFatTestForm, DermatologyTestForm, RecordForm, RegisterForm, ThyroidTestForm
@@ -105,6 +106,8 @@ def home(request):
             records = paginator.page(paginator.num_pages)
 
         return render(request, 'main/home.html', {'records': records, 'query': query, 'doctor': doctor})
+    elif check_user_login(request) == 'patient':
+         return redirect(reverse('detailed_view_record', args=[request.user.id]))
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))   
 
@@ -165,20 +168,20 @@ def sign_up(request):
             PatientBaseRecord.objects.create(
                 id=user.id,
                 patient = get_object_or_404(User, pk=user.id),
-                first_name='first_name',
-                last_name='last_name',
+                first_name='fill in your first name',
+                last_name='fill in your last name',
                 age=18,
                 date_of_birth=datetime.datetime.now(),
                 gender='M',
-                contact_number='380947100983',
-                emergency_contact_number='380947100983',
-                emergency_contact_first_name='emergency_contact_first_name',
-                emergency_contact_last_name='emergency_contact_last_name',
-                emergency_contact_relationship='emergency_contact_relationship',
-                allergies='allergies',
-                chronic_diseases='chronic_diseases',
-                primary_doctor='primary_doctor',
-                notes='notes',
+                contact_number='fill in your number',
+                emergency_contact_number='not set',
+                emergency_contact_first_name='not set',
+                emergency_contact_last_name='not set',
+                emergency_contact_relationship='not set',
+                allergies='None',
+                chronic_diseases='None',
+                primary_doctor='None',
+                notes='',
             )
             login(request, user)
             return redirect(reverse('detailed_view_record', args=[user.id]))
@@ -342,7 +345,7 @@ def add_record(request, record_id, test_type):
             form = form_class()
 
             dynamic_html_content = ''
-            if test_type == 'treatment':
+            if test_type == 'PatientTreatment':
                 patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
                 for diagnosis in patient_diagnoses:
                     dynamic_html_content += f'''
@@ -410,7 +413,10 @@ def update_examinations(request, record_id, diagnosis_id):
             present_exams_shortened_ids = patient_diagnosis.examinations.split(", ")
             cardiologist_examinations = PatientAnalysisCardiologist.objects.filter(patient=patient_record.pk)
             blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
-            unsorted_medical_examinations = list(chain(cardiologist_examinations, blood_tests))
+            thyroid_tests = PatientThyroidTest.objects.filter(patient=patient_record.pk)
+            derm_tests = PatientDermatologyTest.objects.filter(patient=patient_record.pk)
+            bodyfat_tests = PatientBodyFatTest.objects.filter(patient=patient_record.pk)
+            unsorted_medical_examinations = list(chain(cardiologist_examinations, blood_tests, thyroid_tests, derm_tests, bodyfat_tests))
             medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
             
             filtered_medical_examinations = [exam for exam in medical_examinations if exam.shortened_id not in present_exams_shortened_ids]
@@ -423,14 +429,12 @@ def update_examinations(request, record_id, diagnosis_id):
                                 <div>
                                     <h5 class="card-title">Cardiologist test #{exam.shortened_id}</h5>
                                     <p><strong>date:</strong> {exam.date}</p>
-                                    <p><strong>height:</strong> {exam.height}</p>
-                                    <p><strong>weight:</strong> {exam.weight}</p>
                                     <p><strong>Blood Pressure:</strong> {exam.bp}</p>
                                     <p><strong>Type of pain:</strong> {exam.type_of_pain}</p>
                                 </div>
                             </div>
                         </div>'''
-                else:
+                elif exam.get_model_type() == "PatientBlood":
                     dynamic_html_content += f'''    
                         <div class="card mt-2"  id="examination_{exam.shortened_id}">
                             <div class="card-body d-flex flex-row justify-content-between">
@@ -443,7 +447,46 @@ def update_examinations(request, record_id, diagnosis_id):
                                 </div>
                             </div>
                         </div>'''
-
+                elif exam.get_model_type() == "PatientBodyFat":
+                    dynamic_html_content += f'''    
+                        <div class="card mt-2" id="examination_{exam.shortened_id}">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">Body measures test #{exam.shortened_id}</h5> 
+                                <p><strong>date:</strong> {exam.date}</p>
+                                <p><strong>height:</strong> {exam.height}</p>
+                                <p><strong>weight:</strong> {exam.weight}/p>
+                                <p><strong>chest_circ:</strong> {exam.chest_circ}
+                                </p>
+                            </div>
+                        </div>
+                    </div>'''
+                elif exam.get_model_type() == "PatientThyroid":
+                    dynamic_html_content += f'''    
+                        <div class="card mt-2" id="examination_{exam.shortened_id}">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">Thyroid test #{exam.shortened_id}</h5> 
+                                <p><strong>date:</strong> {exam.date}</p>
+                                <p><strong>tsh:</strong> {exam.tsh}</p>
+                                <p><strong>t3:</strong> {exam.t3}</p>
+                                <p><strong>tt4:</strong> {exam.tt4}</p>
+                            </div>
+                        </div>
+                    </div>'''
+                elif exam.get_model_type() == "PatientDermatology":
+                    dynamic_html_content += f'''    
+                        <div class="card mt-2" id="examination_{exam.shortened_id}">
+                        <div class="card-body">
+                            <div>
+                                <h5 class="card-title">Dermatology test #{exam.shortened_id}</h5> 
+                                <p><strong>date:</strong> {exam.date}</p>
+                                <p><strong>scaling:</strong> {exam.scaling}</p>
+                                <p><strong>definite_borders:</strong> {exam.definite_borders}</p>
+                                <p><strong>itching:</strong> {exam.itching}</p>
+                            </div>
+                        </div>
+                    </div>'''
             return render(request, 'main/add_record.html', {'form': form,
                                                             'dynamic_html_content': dynamic_html_content
                                                             })
@@ -458,11 +501,13 @@ def update_examinations(request, record_id, diagnosis_id):
 def predict_blood_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfm_bt.pkl')
+        scaler_path = os.path.join(os.path.dirname(__file__), 'model', 'scaler_bt.pkl')
 
-        with open(model_path, 'rb') as file:
+        with open(model_path, 'rb') as file, open(scaler_path, 'rb') as scaler:
             loaded_model = pickle.load(file)
+            loaded_scaler = pickle.load(scaler)
             patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
-            blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').first()
+            blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
             data = {
                 'Age': [patient_record.age],
@@ -486,13 +531,13 @@ def predict_blood_view(request, record_id):
             predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
 
             reverse_mapping = {
-                "0": "Blood Donor",
-                "1": "suspect Blood Donor",
+                "0": "None",
+                "1": "Posssibly none",
                 "2": "Hepatitis",
                 "3": "Fibrosis",
                 "4": "Cirrhosis"
             }
-
+            df = loaded_scaler.transform(df)
             predicted_class = loaded_model.predict(df)
             predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
 
@@ -504,7 +549,7 @@ def predict_blood_view(request, record_id):
 
             ModelPrediction.objects.create(
                 patient = patient_record,
-                modelname = model_path,
+                modelname = 'Blood test',
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class,
                 class_text = predicted_class_reversed,
@@ -517,58 +562,83 @@ def predict_blood_view(request, record_id):
         return HttpResponseForbidden(render(request, 'main/403.html'))    
 
 
-
 @login_required(login_url='/login')
-def predict_thyroid_view(request, record_id):
+def predict_cardio_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
-        model_path = os.path.join(os.path.dirname(__file__), 'model', 'xgb_thyroid.pkl')
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'ann_heart.pkl')
 
         with open(model_path, 'rb') as file:
             loaded_model = pickle.load(file)
             patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
-            thyroid_test = PatientThyroidTest.objects.filter(patient=patient_record.pk).order_by('date').first()
+            cardio_test = PatientAnalysisCardiologist.objects.filter(patient=patient_record.pk).order_by('date').last()
+            blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
             data = {
-                'T3': [float(thyroid_test.t3) if thyroid_test else None],
-                'TSH': [float(thyroid_test.tsh) if thyroid_test else None],
-                'FTI': [float(thyroid_test.fti) if thyroid_test else None],
-                'T4U': [float(thyroid_test.t4u) if thyroid_test else None],
-                'TT4': [float(thyroid_test.tt4)if thyroid_test else None],
-                'goitre': [bool(thyroid_test.goitre) if thyroid_test else None],
-                'sex': [patient_record.gender],
-                'age': [patient_record.age],
+                'Age': [patient_record.age],
+                'Sex': [patient_record.gender],
+                'Chest pain type': [cardio_test.type_of_pain if cardio_test else None],
+                'BP': [cardio_test.bp if cardio_test else None],
+                'FBS over 120': [blood_test.bg if blood_test else None],
+                'Cholesterol': [blood_test.chol if blood_test else None],
+                'EKG results': [cardio_test.resting_ecg if cardio_test else None],
+                'Max HR': [cardio_test.maxhr if cardio_test else None],
+                'Exercise angina': [bool(cardio_test.excercise_angina) if cardio_test else None],
+                'ST depression': [int(cardio_test.st_depression) if cardio_test else None],
+                'Slope of ST': [int(cardio_test.slope_st) if cardio_test else None],
+                'Number of vessels fluro': [cardio_test.fluoroscopy_vessels if cardio_test else None],
             }
+
 
             df = pd.DataFrame(data)
-            df.replace('M', 0, inplace=True) # male mapped to 0
-            df.replace('F', 1, inplace=True) # female mapped to 1
-            predicted_class = loaded_model.predict(df)
-            predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
+            df.replace('M', 0, inplace=True)
+            df.replace('F', 1, inplace=True)
+
+            df.replace('Normal', 0, inplace=True)
+            df.replace('ST', 1, inplace=True)
+            df.replace('LVH', 2, inplace=True)
+
+            df.replace('Up', 1, inplace=True)
+            df.replace('Flat', 2, inplace=True)
+            df.replace('Down', 3, inplace=True)
+
+            df.replace('TA', 1, inplace=True)
+            df.replace('ATA', 2, inplace=True)
+            df.replace('NAP', 3, inplace=True)
+            df.replace('ASY', 4, inplace=True)
+    
+
+            df['FBS over 120'] = df['FBS over 120'].apply(lambda x: 1 if x > 120 else 0)
+            df['Exercise angina'] = df['Exercise angina'].apply(lambda x: 1 if x == True else 0)
+            
+            [print(i.shape, i.dtype) for i in loaded_model.inputs]
+            [print(o.shape, o.dtype) for o in loaded_model.outputs]
+            [print(l.name, l.input_shape, l.dtype) for l in loaded_model.layers]
 
             print(df.head())
-
-            reverse_mapping = {
-                "0": "negative",
-                "1": "hypothyroid",
-                "2": "hyperthyroid"
-            }
-
+            print(df.dtypes)
+            print(df.values)
             predicted_class = loaded_model.predict(df)
-            predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
+
+            print(df.head())
+            x = np.asarray(df).astype(int)
+            predicted_class_proba = loaded_model.predict(x)
+
+            predicted_class_num = (predicted_class > 0.5)
+
 
             predictions = {
-                'predicted_class_num':predicted_class,
-                'predicted_class_text':predicted_class_reversed,
-                'predictions_proba':predictions_proba
+                'predicted_class_num':predicted_class_num,
+                'predicted_class_text':"stub",
+                'predictions_proba':predicted_class_proba
             }
 
             ModelPrediction.objects.create(
                 patient = patient_record,
                 modelname = model_path,
                 time = datetime.datetime.now(),
-                predicted_class = predicted_class,
-                class_text = predicted_class_reversed,
-                certainty = predictions_proba
+                predicted_class = predicted_class_num,
+                class_text = "stub",
+                certainty = predicted_class_proba
             )
 
             print(predictions)
@@ -586,7 +656,7 @@ def predict_thyroid_view(request, record_id):
         with open(model_path, 'rb') as file:
             loaded_model = pickle.load(file)
             patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
-            thyroid_test = PatientThyroidTest.objects.filter(patient=patient_record.pk).order_by('date').first()
+            thyroid_test = PatientThyroidTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
             data = {
                 'T3': [float(thyroid_test.t3) if thyroid_test else None],
@@ -624,11 +694,71 @@ def predict_thyroid_view(request, record_id):
 
             ModelPrediction.objects.create(
                 patient = patient_record,
-                modelname = model_path,
+                modelname = 'Thyroid',
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class,
                 class_text = predicted_class_reversed,
                 certainty = predictions_proba
+            )
+
+            print(predictions)
+            return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
+    else:
+        return HttpResponseForbidden(render(request, 'main/403.html'))      
+
+
+
+@login_required(login_url='/login')
+def predict_body_fat_view(request, record_id):
+    if check_user_page(request, record_id)  == 'doctor':
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfr_bf.pkl')
+        scaler_path = os.path.join(os.path.dirname(__file__), 'model', 'scaler_bf.pkl')
+
+        with open(model_path, 'rb') as file, open(scaler_path, 'rb') as scaler:
+            loaded_model = pickle.load(file)
+            loaded_scaler = pickle.load(scaler)
+            patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+            bodyfat_test = PatientBodyFatTest.objects.filter(patient=patient_record.pk).order_by('date').last()
+
+            data = {
+                'Sex': [patient_record.gender],
+                'Age': [patient_record.age],
+                'Weight': [float(bodyfat_test.weight) if bodyfat_test else None],
+                'Height': [float(bodyfat_test.height) if bodyfat_test else None],
+                'Neck': [float(bodyfat_test.neck_circ) if bodyfat_test else None],
+                'Chest': [float(bodyfat_test.chest_circ) if bodyfat_test else None],
+                'Abdomen': [float(bodyfat_test.abdomen_circ) if bodyfat_test else None],
+                'Hip': [float(bodyfat_test.hip_circ) if bodyfat_test else None],
+                'Thigh': [float(bodyfat_test.thigh_circ) if bodyfat_test else None],
+                'Knee': [float(bodyfat_test.knee_circ) if bodyfat_test else None],
+                'Ankle': [float(bodyfat_test.ankle_cirk) if bodyfat_test else None],
+                'Biceps': [float(bodyfat_test.bicep_circ) if bodyfat_test else None],
+                'Forearm': [float(bodyfat_test.forearm_circ) if bodyfat_test else None],
+                'Wrist': [float(bodyfat_test.wrist_circ) if bodyfat_test else None],
+            }
+
+            df = pd.DataFrame(data)
+            sex_mapping = {'M': 1, 'F': 0}
+            df['Sex'] = df['Sex'].map(sex_mapping)
+            df_scaled = loaded_scaler.transform(df)
+            predicted_class = loaded_model.predict(df_scaled)
+            #predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
+
+            print(df.head())
+
+            predictions = {
+                'predicted_class_num':predicted_class,
+                'predicted_class_text':"regression",
+                'predictions_proba':"regression"
+            }
+
+            ModelPrediction.objects.create(
+                patient = patient_record,
+                modelname = "Body Fat",
+                time = datetime.datetime.now(),
+                predicted_class = predicted_class,
+                class_text = "regression",
+                certainty = 100.0
             )
 
             print(predictions)

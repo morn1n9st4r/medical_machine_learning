@@ -121,7 +121,7 @@
                         </div>
                     </div>
                 </div>
-                {% elif examination.get_model_type == 'PatientBloodTest' %}
+                {% elif examination.get_model_type == 'PatientBlood' %}
                     <div class="card mt-2" id="examination_{{examination.shortened_id}}">
                         <div class="card-body">
                             <div>
@@ -148,7 +148,7 @@
                             </div>
                         </div>
                     </div>
-                {% elif examination.get_model_type == 'PatientThyroidTest' %}
+                {% elif examination.get_model_type == 'PatientThyroid' %}
                     <div class="card mt-2" id="examination_{{examination.shortened_id}}">
                         <div class="card-body">
                             <div>
@@ -175,7 +175,7 @@
                             </div>
                         </div>
                     </div>
-                {% elif examination.get_model_type == 'PatientDermatologyTest' %}
+                {% elif examination.get_model_type == 'PatientDermatology' %}
                     <div class="card mt-2" id="examination_{{examination.shortened_id}}">
                         <div class="card-body">
                             <div>
@@ -202,7 +202,7 @@
                             </div>
                          </div>
                     </div>
-                {% elif examination.get_model_type == 'PatientBodyFatTest' %}
+                {% elif examination.get_model_type == 'PatientBodyFat' %}
                     <div class="card mt-2" id="examination_{{examination.shortened_id}}">
                         <div class="card-body">
                             <div>
@@ -241,7 +241,7 @@
     <div class="tab-pane fade" id="diagnosis" role="tabpanel" aria-labelledby="diagnosis-tab">
         <div>
             {% if status == 'doctor' %}
-                <a href="{% url 'add_record' record.pk 'diagnosis' %}" class="btn btn-outline-secondary">Add diagnosis</a>
+                <a href="{% url 'add_record' record.pk 'PatientDiagnosis' %}" class="btn btn-outline-secondary">Add diagnosis</a>
             {% endif %}
             {% for diagnosis in patient_diagnoses %}
                 <div class="card mt-2" id="diagnosis_{{diagnosis.shortened_id}}">
@@ -282,7 +282,7 @@
     <div class="tab-pane fade" id="treatment" role="tabpanel" aria-labelledby="treatment-tab">
         <div>
             {% if status == 'doctor' %}
-                <a href="{% url 'add_record' record.pk 'treatment' %}" class="btn btn-outline-secondary" >Add treatment</a>
+                <a href="{% url 'add_record' record.pk 'PatientTreatment' %}" class="btn btn-outline-secondary" >Add treatment</a>
             {% endif %}
             {% for treatment in patient_treatments %}
                  <div class="card mt-2">
@@ -320,6 +320,8 @@
                 <div class="dropdown-menu">
                     <a class="btn btn-outline-secondary" href="{% url 'predict_blood_view' record.pk %}">Check latest blood test</a>
                     <a class="btn btn-outline-secondary" href="{% url 'predict_thyroid_view' record.pk %}">Check latest thyroid test</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'predict_body_fat_view' record.pk %}">Check body fat test</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'predict_cardio_view' record.pk %}">Check body fat test</a>
                 </div>
             </div>
             {% for prediction in model_predictions %}
@@ -329,7 +331,7 @@
                             <h5 class="card-title">Prediction #{{prediction.id}}</h5>
                             <p><strong>modelname:</strong> {{prediction.modelname}}</p>
                             <p><strong>time:</strong> {{prediction.time}}</p>
-                            <p><strong>predicted_class:</strong> {{prediction.predicted_class}}</p>
+                            <p><strong>predicted_class:</strong> {{prediction.predicted_class}} - {{prediction.class_text}}</p>
                             <p><strong>certainty:</strong> {{prediction.certainty}}</p>
 
                         </div>

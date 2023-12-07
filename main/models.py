@@ -49,7 +49,6 @@ class DoctorBaseRecord(models.Model):
 class MedicalRecordsABC(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True)
     patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
-    doctor = models.ForeignKey(DoctorBaseRecord, on_delete=models.CASCADE)
     date = models.DateTimeField()
     
     class Meta:
@@ -72,6 +71,9 @@ class PatientAnalysisCardiologist(MedicalRecordsABC):
     maxhr = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(300)])
     resting_ecg = models.CharField(max_length=255, choices=ECG_CHOICES)
     excercise_angina = models.BooleanField()
+    slope_st =  models.CharField(max_length=255, choices=SLOPE_CHOICES)
+    st_depression = models.FloatField()
+    fluoroscopy_vessels = models.PositiveIntegerField()
     # chol
     # bg
 
@@ -80,6 +82,7 @@ class PatientAnalysisCardiologist(MedicalRecordsABC):
 
     def get_model_type(self):
         return "PatientAnalysisCardiologist"
+
 
 
 class PatientBloodTest(MedicalRecordsABC):
@@ -100,7 +103,7 @@ class PatientBloodTest(MedicalRecordsABC):
         return f"Blood Test for {self.patient} on {self.date}"
     
     def get_model_type(self):
-        return "PatientBloodTest"
+        return "PatientBlood"
 
 class PatientThyroidTest(MedicalRecordsABC):
     
@@ -115,7 +118,7 @@ class PatientThyroidTest(MedicalRecordsABC):
         return f"Thyroid Hormones Test for {self.patient} on {self.date}"
     
     def get_model_type(self):
-        return "PatientThyroidTest"
+        return "PatientThyroid"
 
 class PatientDermatologyTest(MedicalRecordsABC):
 
@@ -157,7 +160,7 @@ class PatientDermatologyTest(MedicalRecordsABC):
         return f"Skin Test for {self.patient} on {self.date}"
     
     def get_model_type(self):
-        return "PatientDermatologyTest"
+        return "PatientDermatology"
 
 
 class PatientBodyFatTest(MedicalRecordsABC):
@@ -178,11 +181,12 @@ class PatientBodyFatTest(MedicalRecordsABC):
         return f"Body parts circumference Test for {self.patient} on {self.date}"
     
     def get_model_type(self):
-        return "PatientBodyFatTest"
+        return "PatientBodyFat"
 
 
 class PatientDiagnosis(MedicalRecordsABC):
 
+    doctor = models.ForeignKey(DoctorBaseRecord, on_delete=models.DO_NOTHING)
     disease_name = models.CharField()
     severity = models.CharField(max_length=2, choices=SEVERITY_CHOICES)   
     details = models.CharField()
@@ -199,6 +203,7 @@ class PatientDiagnosis(MedicalRecordsABC):
     
 class PatientTreatment(MedicalRecordsABC):
 
+    doctor = models.ForeignKey(DoctorBaseRecord, on_delete=models.DO_NOTHING)
     medicine = models.CharField()
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(300)])
     quantity_type = models.CharField()
@@ -215,11 +220,19 @@ class PatientTreatment(MedicalRecordsABC):
     def get_model_type(self):
         return "PatientDiagnosis"
 
-#class MLModel(models.Model):
-#    pass
+
+
+class MLModel(models.Model):
+    id = models.AutoField(primary_key=True)
+    modeltype = models.CharField(choices=MODELTYPE_CHOICES)
+    traindate = models.DateField()
+    parameters = models.CharField()
+
+
 
 class ModelPrediction(models.Model):
     id = models.AutoField(primary_key=True)
+    model = models.ForeignKey(MLModel, null=True, on_delete=models.SET_NULL)
     patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
     modelname = models.CharField(max_length=255)
     time = models.DateTimeField(auto_now_add=True)
