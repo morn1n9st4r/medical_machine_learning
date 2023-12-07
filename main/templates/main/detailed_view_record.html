@@ -321,7 +321,8 @@
                     <a class="btn btn-outline-secondary" href="{% url 'predict_blood_view' record.pk %}">Check latest blood test</a>
                     <a class="btn btn-outline-secondary" href="{% url 'predict_thyroid_view' record.pk %}">Check latest thyroid test</a>
                     <a class="btn btn-outline-secondary" href="{% url 'predict_body_fat_view' record.pk %}">Check body fat test</a>
-                    <a class="btn btn-outline-secondary" href="{% url 'predict_cardio_view' record.pk %}">Check body fat test</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'predict_cardio_view' record.pk %}">Check cardiology test</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'predict_derm_view' record.pk %}">Check dermatology test</a>
                 </div>
             </div>
             {% for prediction in model_predictions %}

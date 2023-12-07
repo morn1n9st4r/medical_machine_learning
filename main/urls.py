@@ -17,4 +17,5 @@ urlpatterns = [
     path('record/<int:record_id>/check_thyroid_test/', views.predict_thyroid_view, name='predict_thyroid_view'),
     path('record/<int:record_id>/check_body_size_test/', views.predict_body_fat_view, name='predict_body_fat_view'),
     path('record/<int:record_id>/check_cardio_test/', views.predict_cardio_view, name='predict_cardio_view'),
+    path('record/<int:record_id>/check_derm_test/', views.predict_derm_view, name='predict_derm_view'),
 ]

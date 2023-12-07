@@ -226,11 +226,11 @@ def detailed_view_record(request, record_id):
                                                    thyroid_tests, derm_tests, bodyfat_tests))
         medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
 
-        patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
+        patient_diagnoses = sorted(PatientDiagnosis.objects.filter(patient=patient_record.pk), key=attrgetter('date'), reverse=True)
 
-        patient_treatments = PatientTreatment.objects.filter(patient=patient_record.pk)
+        patient_treatments = sorted(PatientTreatment.objects.filter(patient=patient_record.pk), key=attrgetter('date'), reverse=True)
 
-        model_predictions = ModelPrediction.objects.filter(patient=patient_record.pk)
+        model_predictions = sorted(ModelPrediction.objects.filter(patient=patient_record.pk), key=attrgetter('time'), reverse=True)
 
         return render(request, 'main/detailed_view_record.html', {
             'record': patient_record,
@@ -759,6 +759,93 @@ def predict_body_fat_view(request, record_id):
                 predicted_class = predicted_class,
                 class_text = "regression",
                 certainty = 100.0
+            )
+
+            print(predictions)
+            return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
+    else:
+        return HttpResponseForbidden(render(request, 'main/403.html'))      
+
+
+
+@login_required(login_url='/login')
+def predict_derm_view(request, record_id):
+    if check_user_page(request, record_id)  == 'doctor':
+        model_path = os.path.join(os.path.dirname(__file__), 'model', 'lgbm_derm.pkl')
+
+        with open(model_path, 'rb') as file:
+            loaded_model = pickle.load(file)
+            patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
+            derm_test = PatientDermatologyTest.objects.filter(patient=patient_record.pk).order_by('date').last()
+
+            data = {
+                'family_history': [bool(derm_test.family_history) if derm_test else None],
+                'erythema': [int(derm_test.erythema ) if derm_test else None],
+                'scaling': [int(derm_test.scaling ) if derm_test else None],
+                'definite_borders': [int(derm_test.definite_borders ) if derm_test else None],
+                'itching': [int(derm_test.itching ) if derm_test else None],
+                'koebner_phenomenon': [int(derm_test.koebner_phenomenon ) if derm_test else None],
+                'polygonal_papules': [int(derm_test.polygonal_papules ) if derm_test else None],
+                'follicular_papules': [int(derm_test.follicular_papules ) if derm_test else None],
+                'oral_mucosal_involvement': [int(derm_test.oral_mucosal_involvement ) if derm_test else None],
+                'knee_and_elbow_involvement': [int(derm_test.knee_and_elbow_involvement ) if derm_test else None],
+                'scalp_involvement': [int(derm_test.scalp_involvement ) if derm_test else None],
+                'melanin_incontinence': [int(derm_test.melanin_incontinence ) if derm_test else None],
+                'eosinophils_in_the_infiltrate': [int(derm_test.eosinophils_in_the_infiltrate ) if derm_test else None],
+                'PNL_infiltrate': [int(derm_test.PNL_infiltrate ) if derm_test else None],
+                'fibrosis_of_the_papillary_dermis': [int(derm_test.fibrosis_of_the_papillary_dermis ) if derm_test else None],
+                'exocytosis': [int(derm_test.exocytosis ) if derm_test else None],
+                'acanthosis': [int(derm_test.acanthosis ) if derm_test else None],
+                'hyperkeratosis': [int(derm_test.hyperkeratosis ) if derm_test else None],
+                'parakeratosis': [int(derm_test.parakeratosis ) if derm_test else None],
+                'clubbing_of_the_rete_ridges': [int(derm_test.clubbing_of_the_rete_ridges ) if derm_test else None],
+                'elongation_of_the_rete_ridges': [int(derm_test.elongation_of_the_rete_ridges ) if derm_test else None],
+                'thinning_of_the_suprapapillary_epidermis': [int(derm_test.thinning_of_the_suprapapillary_epidermis ) if derm_test else None],
+                'spongiform_pustule': [int(derm_test.spongiform_pustule ) if derm_test else None],
+                'munro_microabcess': [int(derm_test.munro_microabcess ) if derm_test else None],
+                'focal_hypergranulosis': [int(derm_test.focal_hypergranulosis ) if derm_test else None],
+                'disappearance_of_the_granular_layer': [int(derm_test.disappearance_of_the_granular_layer ) if derm_test else None],
+                'vacuolisation_and_damage_of_basal_layer': [int(derm_test.vacuolisation_and_damage_of_basal_layer ) if derm_test else None],
+                'spongiosis': [int(derm_test.spongiosis ) if derm_test else None],
+                'saw_tooth_appearance_of_retes': [int(derm_test.saw_tooth_appearance_of_retes ) if derm_test else None],
+                'follicular_horn_plug': [int(derm_test.follicular_horn_plug ) if derm_test else None],
+                'perifollicular_parakeratosis': [int(derm_test.perifollicular_parakeratosis ) if derm_test else None],
+                'inflammatory_monoluclear_inflitrate': [int(derm_test.inflammatory_monoluclear_inflitrate ) if derm_test else None],
+                'band_like_infiltrate': [int(derm_test.band_like_infiltrate ) if derm_test else None],
+                'age': [patient_record.age],
+            }
+            
+            df = pd.DataFrame(data)
+            print(df.head())
+
+            reverse_mapping = {
+                "1": "psoriasis",
+                "2": "seborrheic dermatitis",
+                "3": "lichen planus",
+                "4": "pityriasis rosea",
+                "5": "chronic dermatitis",
+                "6": "pityriasis trichosanthes",
+            }
+
+            predicted_class = loaded_model.predict(df)
+            predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
+            predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
+
+            print(df.head())
+
+            predictions = {
+                'predicted_class_num':predicted_class,
+                'predicted_class_text':predicted_class_reversed,
+                'predictions_proba':predictions_proba
+            }
+
+            ModelPrediction.objects.create(
+                patient = patient_record,
+                modelname = "Derm",
+                time = datetime.datetime.now(),
+                predicted_class = predicted_class,
+                class_text = predicted_class_reversed,
+                certainty = predictions_proba
             )
 
             print(predictions)

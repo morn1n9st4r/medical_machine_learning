@@ -78,7 +78,7 @@ class PatientAnalysisCardiologist(MedicalRecordsABC):
     # bg
 
     def __str__(self):
-        return f"ID: {self.id} - Patient: {self.patient_id}, Doctor: {self.doctor_id}, Date: {self.date}"
+        return f"ID: {self.id} - Patient: {self.patient_id}, Date: {self.date}"
 
     def get_model_type(self):
         return "PatientAnalysisCardiologist"
