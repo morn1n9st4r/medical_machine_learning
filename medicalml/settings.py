@@ -89,9 +89,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'medicalmldb',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '172.17.0.2',
+        'USER': 'medicalmladmin',
+        'PASSWORD': 'Qwerty12345',
+        'HOST': 'rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
         'PORT': '5432'
     }
 }
