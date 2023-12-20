@@ -1,0 +1,12 @@
+Django==4.2.5
+numpy
+pandas
+datetime
+uuid
+django-auditlog
+django_forms_bootstrap
+django-bootstrap-datepicker-plus
+django-crispy-forms
+crispy_bootstrap5
+psycopg
+psycopg2-binary
