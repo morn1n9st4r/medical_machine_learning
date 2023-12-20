@@ -10,3 +10,4 @@ django-crispy-forms
 crispy_bootstrap5
 psycopg
 psycopg2-binary
+xgboost
