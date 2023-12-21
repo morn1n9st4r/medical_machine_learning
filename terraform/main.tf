@@ -24,3 +24,9 @@ resource "aws_db_instance" "rds_instance" {
     }
 }
 
+
+resource "aws_s3_bucket" "medicalmlbucket" {
+
+    bucket = var.bucket_name
+
+}
