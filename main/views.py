@@ -93,7 +93,7 @@ def home(request):
         else:
             records = PatientBaseRecord.objects.all()
 
-        records_per_page = 10
+        records_per_page = 6
 
         paginator = Paginator(records, records_per_page)
         page = request.GET.get('page')
@@ -163,17 +163,17 @@ def sign_up(request):
 
     if request.method == 'POST':
         form = RegisterForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and form.cleaned_data['agree_to_terms']:
             user = form.save(commit=True)
             PatientBaseRecord.objects.create(
                 id=user.id,
                 patient = get_object_or_404(User, pk=user.id),
-                first_name='fill in your first name',
-                last_name='fill in your last name',
-                age=18,
+                first_name='fill in',
+                last_name='fill in',
+                age=0,
                 date_of_birth=datetime.datetime.now(),
                 gender='M',
-                contact_number='fill in your number',
+                contact_number='fill in',
                 emergency_contact_number='not set',
                 emergency_contact_first_name='not set',
                 emergency_contact_last_name='not set',
@@ -192,6 +192,8 @@ def sign_up(request):
 
 
 
+def terms_and_conditions(request):
+    return render(request, 'main/terms_and_conditions.html')
 
 
 @login_required(login_url='/login')
@@ -267,6 +269,7 @@ def edit_profile(request, record_id):
     """
     if check_user_page(request, record_id) == 'doctor' or check_user_page(request, record_id)  == 'patient':
         record = get_object_or_404(PatientBaseRecord, pk=record_id)
+        status = check_user_page(request, record_id)
 
         if request.method == "POST":
             form = RecordForm(request.POST, instance=record)
@@ -276,13 +279,15 @@ def edit_profile(request, record_id):
         else:
             form = RecordForm(instance=record)
 
-        return render(request, "main/edit_record.html", {"form": form, "record": record})
+        return render(request, "main/edit_record.html", {"form": form, "record": record, "status": status, 'page': 'profile'})
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
     
 @login_required(login_url='/login')
 def edit_record(request, record_id, exam_type, id):
     
+    status = check_user_page(request, record_id)
+
     record = get_object_or_404(get_model_class(exam_type), pk=id)
     form_class = get_form_class(exam_type)
 
@@ -294,7 +299,7 @@ def edit_record(request, record_id, exam_type, id):
             return redirect('detailed_view_record', record_id=record_id)  # Replace with the appropriate success URL
     else:
         form = form_class(instance=record)
-    return render(request, "main/edit_record.html", {"form": form, "record": record})
+    return render(request, "main/edit_record.html", {"form": form, "record": record, "status": status})
 
 
 
@@ -584,7 +589,7 @@ def predict_cardio_view(request, record_id):
                 'Max HR': [cardio_test.maxhr if cardio_test else None],
                 'Exercise angina': [bool(cardio_test.excercise_angina) if cardio_test else None],
                 'ST depression': [int(cardio_test.st_depression) if cardio_test else None],
-                'Slope of ST': [int(cardio_test.slope_st) if cardio_test else None],
+                'Slope of ST': [cardio_test.slope_st if cardio_test else None],
                 'Number of vessels fluro': [cardio_test.fluoroscopy_vessels if cardio_test else None],
             }
 
@@ -624,20 +629,24 @@ def predict_cardio_view(request, record_id):
             predicted_class_proba = loaded_model.predict(x)
 
             predicted_class_num = (predicted_class > 0.5)
+            if predicted_class_num:
+                predicted_class_text = 'possible disorder'
+            else:
+                predicted_class_text = 'absence of disorder'
 
 
             predictions = {
                 'predicted_class_num':predicted_class_num,
-                'predicted_class_text':"stub",
+                'predicted_class_text': predicted_class_text,
                 'predictions_proba':predicted_class_proba
             }
 
             ModelPrediction.objects.create(
                 patient = patient_record,
-                modelname = model_path,
+                modelname = "Cardio",
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class_num,
-                class_text = "stub",
+                class_text = predicted_class_text,
                 certainty = predicted_class_proba
             )
 
@@ -748,7 +757,7 @@ def predict_body_fat_view(request, record_id):
 
             predictions = {
                 'predicted_class_num':predicted_class,
-                'predicted_class_text':"regression",
+                'predicted_class_text':"percents",
                 'predictions_proba':"regression"
             }
 
@@ -757,8 +766,8 @@ def predict_body_fat_view(request, record_id):
                 modelname = "Body Fat",
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class,
-                class_text = "regression",
-                certainty = 100.0
+                class_text = "percents",
+                certainty = 1
             )
 
             print(predictions)
@@ -830,6 +839,10 @@ def predict_derm_view(request, record_id):
             predicted_class = loaded_model.predict(df)
             predictions_proba = loaded_model.predict_proba(df)[0, predicted_class]
             predicted_class_reversed = [reverse_mapping[str(label)] for label in predicted_class]
+
+            if predictions_proba < 0.65:
+                predicted_class = 0
+                predicted_class_reversed = 'Nothing'
 
             print(df.head())
 

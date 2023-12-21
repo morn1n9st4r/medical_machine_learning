@@ -8,6 +8,11 @@ from bootstrap_datepicker_plus.widgets import DatePickerInput
 class RegisterForm(UserCreationForm):
     
     email = forms.EmailField(required=True)
+    agree_to_terms = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label='I agree to the terms and conditions of usage and storage of my personal data.'
+    )
 
     class Meta:
         model = User
