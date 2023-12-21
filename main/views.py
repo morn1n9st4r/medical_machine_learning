@@ -548,8 +548,8 @@ def predict_blood_view(request, record_id):
 
             predictions = {
                 'predicted_class_num':predicted_class,
-                'predicted_class_text':predicted_class_reversed,
-                'predictions_proba':predictions_proba
+                'predicted_class_text':predicted_class_reversed[0],
+                'predictions_proba':predictions_proba[0]
             }
 
             ModelPrediction.objects.create(
@@ -557,8 +557,8 @@ def predict_blood_view(request, record_id):
                 modelname = 'Blood test',
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class,
-                class_text = predicted_class_reversed,
-                certainty = predictions_proba
+                class_text = predicted_class_reversed[0],
+                certainty = predictions_proba[0]
             )
 
             print(predictions)
@@ -637,8 +637,8 @@ def predict_cardio_view(request, record_id):
 
             predictions = {
                 'predicted_class_num':predicted_class_num,
-                'predicted_class_text': predicted_class_text,
-                'predictions_proba':predicted_class_proba
+                'predicted_class_text': predicted_class_text[0],
+                'predictions_proba':predicted_class_proba[0]
             }
 
             ModelPrediction.objects.create(
@@ -646,8 +646,8 @@ def predict_cardio_view(request, record_id):
                 modelname = "Cardio",
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class_num,
-                class_text = predicted_class_text,
-                certainty = predicted_class_proba
+                class_text = predicted_class_text[0],
+                certainty = predicted_class_proba[0]
             )
 
             print(predictions)
@@ -687,9 +687,9 @@ def predict_thyroid_view(request, record_id):
             print(df.head())
 
             reverse_mapping = {
-                "0": "negative",
-                "1": "hypothyroid",
-                "2": "hyperthyroid"
+                "0": "Negative",
+                "1": "Hypothyroid",
+                "2": "Hyperthyroid"
             }
 
             predicted_class = loaded_model.predict(df)
@@ -697,8 +697,8 @@ def predict_thyroid_view(request, record_id):
 
             predictions = {
                 'predicted_class_num':predicted_class,
-                'predicted_class_text':predicted_class_reversed,
-                'predictions_proba':predictions_proba
+                'predicted_class_text':predicted_class_reversed[0],
+                'predictions_proba':predictions_proba[0]
             }
 
             ModelPrediction.objects.create(
@@ -706,8 +706,8 @@ def predict_thyroid_view(request, record_id):
                 modelname = 'Thyroid',
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class,
-                class_text = predicted_class_reversed,
-                certainty = predictions_proba
+                class_text = predicted_class_reversed[0],
+                certainty = predictions_proba[0]
             )
 
             print(predictions)
@@ -848,8 +848,8 @@ def predict_derm_view(request, record_id):
 
             predictions = {
                 'predicted_class_num':predicted_class,
-                'predicted_class_text':predicted_class_reversed,
-                'predictions_proba':predictions_proba
+                'predicted_class_text':predicted_class_reversed[0],
+                'predictions_proba':predictions_proba[0]
             }
 
             ModelPrediction.objects.create(
@@ -857,8 +857,8 @@ def predict_derm_view(request, record_id):
                 modelname = "Derm",
                 time = datetime.datetime.now(),
                 predicted_class = predicted_class,
-                class_text = predicted_class_reversed,
-                certainty = predictions_proba
+                class_text = predicted_class_reversed[0],
+                certainty = predictions_proba[0]
             )
 
             print(predictions)
