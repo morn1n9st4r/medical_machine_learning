@@ -508,6 +508,7 @@ def predict_blood_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfm_bt.pkl')
         scaler_path = os.path.join(os.path.dirname(__file__), 'model', 'scaler_bt.pkl')
+        current_date = datetime.date.today()
 
         with open(model_path, 'rb') as file, open(scaler_path, 'rb') as scaler:
             loaded_model = pickle.load(file)
@@ -517,7 +518,7 @@ def predict_blood_view(request, record_id):
                 blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
                 data = {
-                    #'Age': [patient_record.age],
+                    'Age': [current_date.year - patient_record.date_of_birth.year - ((current_date.month, current_date.day) < (patient_record.date_of_birth.month, patient_record.date_of_birth.day))],
                     'Sex': [patient_record.gender],
                     'ALB': [blood_test.alb if blood_test else None],
                     'ALP': [blood_test.alp if blood_test else None],
@@ -575,6 +576,7 @@ def predict_blood_view(request, record_id):
 def predict_cardio_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'ann_heart.pkl')
+        current_date = datetime.date.today()
 
         with open(model_path, 'rb') as file:
             loaded_model = pickle.load(file)
@@ -584,7 +586,7 @@ def predict_cardio_view(request, record_id):
                 blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
                 data = {
-                    #'Age': [patient_record.age],
+                    'Age': [current_date.year - patient_record.date_of_birth.year - ((current_date.month, current_date.day) < (patient_record.date_of_birth.month, patient_record.date_of_birth.day))],
                     'Sex': [patient_record.gender],
                     'Chest pain type': [cardio_test.type_of_pain if cardio_test else None],
                     'BP': [cardio_test.bp if cardio_test else None],
@@ -669,6 +671,7 @@ def predict_cardio_view(request, record_id):
 def predict_thyroid_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'xgb_thyroid.pkl')
+        current_date = datetime.date.today()
 
         with open(model_path, 'rb') as file:
             loaded_model = pickle.load(file)
@@ -684,7 +687,7 @@ def predict_thyroid_view(request, record_id):
                     'TT4': [float(thyroid_test.tt4)if thyroid_test else None],
                     'goitre': [bool(thyroid_test.goitre) if thyroid_test else None],
                     'sex': [patient_record.gender],
-                    #'age': [patient_record.age],
+                    'age': [current_date.year - patient_record.date_of_birth.year - ((current_date.month, current_date.day) < (patient_record.date_of_birth.month, patient_record.date_of_birth.day))],
                 }
 
                 df = pd.DataFrame(data)
@@ -734,6 +737,7 @@ def predict_body_fat_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'rfr_bf.pkl')
         scaler_path = os.path.join(os.path.dirname(__file__), 'model', 'scaler_bf.pkl')
+        current_date = datetime.date.today()
 
         with open(model_path, 'rb') as file, open(scaler_path, 'rb') as scaler:
             loaded_model = pickle.load(file)
@@ -744,7 +748,7 @@ def predict_body_fat_view(request, record_id):
 
                 data = {
                     'Sex': [patient_record.gender],
-                    #'Age': [patient_record.age],
+                    'Age': [current_date.year - patient_record.date_of_birth.year - ((current_date.month, current_date.day) < (patient_record.date_of_birth.month, patient_record.date_of_birth.day))],
                     'Weight': [float(bodyfat_test.weight) if bodyfat_test else None],
                     'Height': [float(bodyfat_test.height) if bodyfat_test else None],
                     'Neck': [float(bodyfat_test.neck_circ) if bodyfat_test else None],
@@ -796,7 +800,7 @@ def predict_body_fat_view(request, record_id):
 def predict_derm_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
         model_path = os.path.join(os.path.dirname(__file__), 'model', 'lgbm_derm.pkl')
-
+        current_date = datetime.date.today()
         with open(model_path, 'rb') as file:
             loaded_model = pickle.load(file)
             patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
@@ -836,7 +840,7 @@ def predict_derm_view(request, record_id):
                     'perifollicular_parakeratosis': [int(derm_test.perifollicular_parakeratosis ) if derm_test else None],
                     'inflammatory_monoluclear_inflitrate': [int(derm_test.inflammatory_monoluclear_inflitrate ) if derm_test else None],
                     'band_like_infiltrate': [int(derm_test.band_like_infiltrate ) if derm_test else None],
-                    #'age': [patient_record.age],
+                    'age': [current_date.year - patient_record.date_of_birth.year - ((current_date.month, current_date.day) < (patient_record.date_of_birth.month, patient_record.date_of_birth.day))],
                 }
                 
                 df = pd.DataFrame(data)
