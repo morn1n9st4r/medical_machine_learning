@@ -22,7 +22,7 @@ class RegisterForm(UserCreationForm):
 class RecordForm(forms.ModelForm):
     class Meta:
         model = PatientBaseRecord
-        fields = ['first_name','last_name','age','date_of_birth','gender','contact_number',
+        fields = ['first_name','last_name','date_of_birth','gender','contact_number',
                 'emergency_contact_number','emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_relationship',
                 'allergies', 'chronic_diseases', 'primary_doctor', 'notes']
         widgets = {

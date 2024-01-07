@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% block title %}Patient {{record.pk}}{% endblock %}
 {% load crispy_forms_tags %}
 {% load medicalml_extras %}
 
@@ -31,7 +32,7 @@
         <div class="row">
             <div class="col-md-6">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong class="text-primary">Age:</strong> {{ record.age }}</li>
+                    <li class="list-group-item"><strong class="text-primary">Age:</strong> {{ record.date_of_birth|calculate_age }}</li>
                     <li class="list-group-item"><strong class="text-primary">Date of Birth:</strong> {{ record.date_of_birth }}</li>
                     <li class="list-group-item"><strong class="text-primary">Gender:</strong> {{ record.gender|tag_definition }}</li>
                     <li class="list-group-item"><strong class="text-primary">Contact Number:</strong> {{ record.contact_number }}</li>
@@ -113,13 +114,13 @@
                             </div>                           
                             <div class="mb-2">
                                 <strong>Date:</strong> {{examination.date}}
-                            </div>
-                            <div class="mb-2">
+                            </div>     
+                            <!-- <div class="mb-2">
                                 <strong>Blood Pressure:</strong> {{examination.bp}}
                             </div>
                             <div class="mb-2">
                                 <strong>Type of Pain:</strong> {{examination.type_of_pain}}
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -138,9 +139,9 @@
                                     {% endif %}  
                                 </div>  
                                 <div class="mb-2">
-                                    <strong>date:</strong> {{examination.date}}
+                                    <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <div class="mb-2">
+                                <!-- <div class="mb-2">
                                     <strong>alb:</strong> {{examination.alb}}
                                 </div>
                                 <div class="mb-2">
@@ -148,7 +149,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>prot:</strong> {{examination.prot}}
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -167,9 +168,9 @@
                                     {%endif%}
                                 </div>  
                                 <div class="mb-2">
-                                    <strong>date:</strong> {{examination.date}}
+                                    <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <div class="mb-2">
+                                <!-- <div class="mb-2">
                                     <strong>ths:</strong> {{examination.ths}}
                                 </div>
                                 <div class="mb-2">
@@ -177,7 +178,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>tt4:</strong> {{examination.tt4}}
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -196,9 +197,9 @@
                                     {%endif%}   
                                 </div>  
                                 <div class="mb-2">
-                                    <strong>date:</strong> {{examination.date}}
+                                    <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <div class="mb-2">
+                                <!-- <div class="mb-2">
                                     <strong>scaling:</strong> {{examination.scaling|tag_definition }}
                                 </div>
                                 <div class="mb-2">
@@ -206,7 +207,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>itching:</strong> {{examination.itching|tag_definition }}
-                                </div>
+                                </div> -->
                             </div>
                          </div>
                     </div>
@@ -225,9 +226,9 @@
                                     {%endif%}  
                                 </div>  
                                 <div class="mb-2">
-                                    <strong>date:</strong> {{examination.date}}
+                                    <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <div class="mb-2">
+                                <!-- <div class="mb-2">
                                     <strong>height:</strong> {{examination.height}}
                                 </div>
                                 <div class="mb-2">
@@ -235,7 +236,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>chest_circ:</strong> {{examination.chest_circ}}
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -326,6 +327,7 @@
     </div>
     {% if status == 'doctor'%}
     <div class="tab-pane fade" id="machinelearning" role="tabpanel" aria-labelledby="machinelearning-tab">
+
         <div>
             <div class="btn-group">
                 <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -359,9 +361,8 @@
     </div>
     {% endif %}
 
-
-
 </div>
+
 
 
 <script>
@@ -387,6 +388,22 @@ $(document).ready(function() {
                 scrollTop: $('#diagnosis_' + uuid).offset().top
             }, 500);
         });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the active tab from the context
+        var activeTab = "{{ active_tab }}";
+
+        // Activate the desired tab using JavaScript
+        if (activeTab) {
+            var tabLink = document.querySelector(`#${activeTab}-tab`);
+            if (tabLink) {
+                tabLink.click();  // Trigger a click event on the tab link
+            }
+        }
     });
 </script>
 

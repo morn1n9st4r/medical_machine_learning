@@ -2,6 +2,8 @@
 {% block title %}List of Patients{% endblock %}
 {% block content %}
 
+{% load medicalml_extras %}
+
 {% load static %}
 <link rel="stylesheet" href="static/css/style.css">
 
@@ -39,7 +41,8 @@
             <h5 class="card-title">{{record.patient_id}}</h5>
             <p>{{record.first_name}}</p>
             <p>{{record.last_name}}</p>
-            <p>{{record.age}}</p>
+            <p>{{ record.date_of_birth|date:"F d, Y" }}</p>
+            <p>{{ record.date_of_birth|calculate_age }} years old</p>
             <p>{{record.gender}}</p>
             <p>{{record.contact_number}}</p>
         </div>

@@ -170,7 +170,7 @@ def sign_up(request):
                 patient = get_object_or_404(User, pk=user.id),
                 first_name='fill in',
                 last_name='fill in',
-                age=0,
+                #age=0,
                 date_of_birth=datetime.datetime.now(),
                 gender='M',
                 contact_number='fill in',
@@ -197,7 +197,7 @@ def terms_and_conditions(request):
 
 
 @login_required(login_url='/login')
-def detailed_view_record(request, record_id):
+def detailed_view_record(request, record_id, active_tab='examination'):
     """
     Renders the detailed view record page for a patient.
 
@@ -240,7 +240,8 @@ def detailed_view_record(request, record_id):
             'patient_diagnoses': patient_diagnoses,
             'patient_treatments': patient_treatments,
             'model_predictions': model_predictions,
-            'status': status
+            'status': status,
+            'active_tab': active_tab
             })
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))  
@@ -516,7 +517,7 @@ def predict_blood_view(request, record_id):
                 blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
                 data = {
-                    'Age': [patient_record.age],
+                    #'Age': [patient_record.age],
                     'Sex': [patient_record.gender],
                     'ALB': [blood_test.alb if blood_test else None],
                     'ALP': [blood_test.alp if blood_test else None],
@@ -564,8 +565,7 @@ def predict_blood_view(request, record_id):
 
                 print(predictions)
                 return render(request, 'main/results.html', {'record': patient_record, 'prediction': predictions})
-        
-            except Exception as e:
+            except ValueError as e:
                 return HttpResponseNotFound(render(request, 'main/error.html', {'error_message': 'Data absent or in wrong format.'}))   
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
@@ -584,7 +584,7 @@ def predict_cardio_view(request, record_id):
                 blood_test = PatientBloodTest.objects.filter(patient=patient_record.pk).order_by('date').last()
 
                 data = {
-                    'Age': [patient_record.age],
+                    #'Age': [patient_record.age],
                     'Sex': [patient_record.gender],
                     'Chest pain type': [cardio_test.type_of_pain if cardio_test else None],
                     'BP': [cardio_test.bp if cardio_test else None],
@@ -684,7 +684,7 @@ def predict_thyroid_view(request, record_id):
                     'TT4': [float(thyroid_test.tt4)if thyroid_test else None],
                     'goitre': [bool(thyroid_test.goitre) if thyroid_test else None],
                     'sex': [patient_record.gender],
-                    'age': [patient_record.age],
+                    #'age': [patient_record.age],
                 }
 
                 df = pd.DataFrame(data)
@@ -744,7 +744,7 @@ def predict_body_fat_view(request, record_id):
 
                 data = {
                     'Sex': [patient_record.gender],
-                    'Age': [patient_record.age],
+                    #'Age': [patient_record.age],
                     'Weight': [float(bodyfat_test.weight) if bodyfat_test else None],
                     'Height': [float(bodyfat_test.height) if bodyfat_test else None],
                     'Neck': [float(bodyfat_test.neck_circ) if bodyfat_test else None],
@@ -836,7 +836,7 @@ def predict_derm_view(request, record_id):
                     'perifollicular_parakeratosis': [int(derm_test.perifollicular_parakeratosis ) if derm_test else None],
                     'inflammatory_monoluclear_inflitrate': [int(derm_test.inflammatory_monoluclear_inflitrate ) if derm_test else None],
                     'band_like_infiltrate': [int(derm_test.band_like_infiltrate ) if derm_test else None],
-                    'age': [patient_record.age],
+                    #'age': [patient_record.age],
                 }
                 
                 df = pd.DataFrame(data)

@@ -12,7 +12,7 @@ class PatientBaseRecord(models.Model):
     patient = models.ForeignKey(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    age = models.IntegerField()
+    #age = models.IntegerField()
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     contact_number = models.CharField(max_length=15)

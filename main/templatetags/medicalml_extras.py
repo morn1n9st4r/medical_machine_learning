@@ -1,3 +1,4 @@
+from datetime import date
 from django import template
 
 
@@ -26,3 +27,9 @@ def tag_definition(value):
 @register.filter(name='split_examinations')
 def split_examinations(value):
     return value.split(', ')
+
+@register.filter(name='calculate_age')
+def calculate_age(date_of_birth):
+    current_date = date.today()
+    age = current_date.year - date_of_birth.year - ((current_date.month, current_date.day) < (date_of_birth.month, date_of_birth.day))
+    return age
