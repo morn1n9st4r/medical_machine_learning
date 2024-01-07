@@ -26,7 +26,7 @@ class PatientBaseRecord(models.Model):
     notes = models.TextField(blank=True, default=0, null=True)
 
     def __str__(self):
-        return f"ID: {self.id} - {self.first_name} {self.last_name}, Age: {self.age}"
+        return f"ID: {self.id} - {self.first_name} {self.last_name}, DoB: {self.date_of_birth}"
 
 
 class DoctorBaseRecord(models.Model):
@@ -34,7 +34,7 @@ class DoctorBaseRecord(models.Model):
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    age = models.IntegerField()
+    #age = models.IntegerField()
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     contact_number = models.CharField(max_length=15)
@@ -43,7 +43,7 @@ class DoctorBaseRecord(models.Model):
     notes = models.TextField(blank=True, default=0, null=True)
 
     def __str__(self):
-        return f"ID: {self.id} - Dr. {self.first_name} {self.last_name}, Age: {self.age}"
+        return f"ID: {self.id} - Dr. {self.first_name} {self.last_name}, DoB: {self.date_of_birth}"
 
 
 class MedicalRecordsABC(models.Model):
