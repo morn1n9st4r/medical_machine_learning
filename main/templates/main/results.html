@@ -1,12 +1,13 @@
 {% extends 'main/base.html' %}
-{% block title %}List of Patients{% endblock %}
+{% block title %}Model Results{% endblock %}
 {% block content %}
 
 <h1>Model Results</h1>
 
 <p>Predictions:</p>class_text
-<div>{{ prediction.predicted_class_num.0 }}</div>
-<div>{{ prediction.predicted_class_text.0 }}</div>
-<div>{{ prediction.predictions_proba.0 }}</div>
+<div>{{ prediction.predicted_class_num }}</div>
+<div>{{ prediction.predicted_class_text }}</div>
+<div>{{ prediction.predictions_proba }}</div>
 
+<a href="{% url 'detailed_view_record' record.patient.id %}" class="btn btn-secondary">Back</a>
 {% endblock %}

@@ -5,7 +5,7 @@
 {% load medicalml_extras %}
 
 {% load static %}
-<link rel="stylesheet" href="static/css/style.css">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 
 <div class="card custom-doctor-card">
@@ -35,15 +35,15 @@
 
 {% for record in records %}
 <div class="card mt-2">
-    <!-- <div class="card-header"><strong>@{{record.author.username}}</strong></div> -->
+
     <div class="card-body d-flex flex-row justify-content-between">
         
         <div>
             <h5 class="card-title">{{record.patient_id}}</h5>
             <p>{{record.first_name}}</p>
             <p>{{record.last_name}}</p>
-            <p>{{ record.date_of_birth|date:"F d, Y" }}</p>
-            <p>{{ record.date_of_birth|calculate_age }} years old</p>
+            <p>{{record.date_of_birth|date:"F d, Y" }}</p>
+            <p>{{record.date_of_birth|calculate_age }} years old</p>
             <p>{{record.gender}}</p>
             <p>{{record.contact_number}}</p>
         </div>

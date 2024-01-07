@@ -9,24 +9,19 @@
 
 
 {% load static %}
-<link rel="stylesheet" href="{% static 'main/style.css' %}">
-
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 
 <h2>Detailed View</h2>
 
-<div class="card-body">
-    {% if status == 'doctor' or status == 'patient' %}
-        <div class="d-flex justify-content-end">
-            <a class="btn btn-outline-secondary" href="{% url 'edit_profile' record.pk %}">Edit</a>
-        </div>
-    {% endif %}
-</div>
 
 
 <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-baseline">
         <h5 class="card-title">{{ record.first_name }} {{ record.last_name }}</h5>
+        {% if status == 'doctor' or status == 'patient' %}
+            <a class="btn btn-outline-secondary" href="{% url 'edit_profile' record.pk %}">Edit</a>
+        {% endif %}
     </div>
     <div class="card-body">
         <div class="row">
@@ -115,12 +110,6 @@
                             <div class="mb-2">
                                 <strong>Date:</strong> {{examination.date}}
                             </div>     
-                            <!-- <div class="mb-2">
-                                <strong>Blood Pressure:</strong> {{examination.bp}}
-                            </div>
-                            <div class="mb-2">
-                                <strong>Type of Pain:</strong> {{examination.type_of_pain}}
-                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -141,15 +130,6 @@
                                 <div class="mb-2">
                                     <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <!-- <div class="mb-2">
-                                    <strong>alb:</strong> {{examination.alb}}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>chol:</strong> {{examination.chol}}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>prot:</strong> {{examination.prot}}
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -170,15 +150,6 @@
                                 <div class="mb-2">
                                     <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <!-- <div class="mb-2">
-                                    <strong>ths:</strong> {{examination.ths}}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>t3:</strong> {{examination.t3}}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>tt4:</strong> {{examination.tt4}}
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -199,15 +170,6 @@
                                 <div class="mb-2">
                                     <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <!-- <div class="mb-2">
-                                    <strong>scaling:</strong> {{examination.scaling|tag_definition }}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>definite_borders:</strong> {{examination.definite_borders|tag_definition }}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>itching:</strong> {{examination.itching|tag_definition }}
-                                </div> -->
                             </div>
                          </div>
                     </div>
@@ -228,15 +190,6 @@
                                 <div class="mb-2">
                                     <strong>Date:</strong> {{examination.date}}
                                 </div>
-                                <!-- <div class="mb-2">
-                                    <strong>height:</strong> {{examination.height}}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>weight:</strong> {{examination.weight}}
-                                </div>
-                                <div class="mb-2">
-                                    <strong>chest_circ:</strong> {{examination.chest_circ}}
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -268,12 +221,12 @@
                                     </form>    
                                 {%endif%} 
                             </div>     
-                            <p><strong>date:</strong> {{diagnosis.date}}</p>
-                            <p><strong>disease_name:</strong> {{diagnosis.disease_name}}</p>
-                            <p><strong>severity:</strong> {{diagnosis.severity|tag_definition}}</p>
-                            <p><strong>tag:</strong> {{diagnosis.tags|tag_definition}}</p>
-                            <p><strong>details:</strong> {{diagnosis.details}}</p>
-                            <p><strong>examinations:</strong></p>
+                            <p><strong>Date:</strong> {{diagnosis.date}}</p>
+                            <p><strong>Disease name:</strong> {{diagnosis.disease_name}}</p>
+                            <p><strong>Severity:</strong> {{diagnosis.severity|tag_definition}}</p>
+                            <p><strong>Tag:</strong> {{diagnosis.tags|tag_definition}}</p>
+                            <p><strong>Details:</strong> {{diagnosis.details}}</p>
+                            <p><strong>Examinations:</strong></p>
                             {% for uuid in diagnosis.examinations|split_examinations %}
                                 <a href="#examination_{{uuid}}" class="examination-link" data-uuid="{{uuid}}">{{ uuid }}</a>
                             {% endfor %}
@@ -311,11 +264,11 @@
                                     </form>  
                                 {%endif%}   
                             </div>   
-                            <p><strong>date:</strong> {{treatment.date}}</p>
-                            <p><strong>medicine:</strong> {{treatment.medicine}}</p>
-                            <p><strong>quantity:</strong> {{treatment.quantity}} {{treatment.quantity_type}} {{treatment.frequency|tag_definition}}</p>
-                            <p><strong>take:</strong> from {{treatment.start_date}} to {{treatment.finish_date}}</p>
-                            <p><strong>form:</strong> {{treatment.form|tag_definition}}</p>
+                            <p><strong>Date:</strong> {{treatment.date}}</p>
+                            <p><strong>Medicine:</strong> {{treatment.medicine}}</p>
+                            <p><strong>Quantity:</strong> {{treatment.quantity}} {{treatment.quantity_type}} {{treatment.frequency|tag_definition}}</p>
+                            <p><strong>Take:</strong> from {{treatment.start_date}} to {{treatment.finish_date}}</p>
+                            <p><strong>Form:</strong> {{treatment.form|tag_definition}}</p>
                             For diagnosis: <a href="#diagnosis_{{treatment.diagnosis}}" class="diagnosis-link" data-uuid="{{treatment.diagnosis}}">{{treatment.diagnosis}}</a></li>
                         </div>
                     </div>
@@ -334,11 +287,11 @@
                     Select model
                 </button>
                 <div class="dropdown-menu">
-                    <a class="btn btn-outline-secondary" href="{% url 'predict_blood_view' record.pk %}">Check latest blood test</a>
-                    <a class="btn btn-outline-secondary" href="{% url 'predict_thyroid_view' record.pk %}">Check latest thyroid test</a>
-                    <a class="btn btn-outline-secondary" href="{% url 'predict_body_fat_view' record.pk %}">Check body fat test</a>
-                    <a class="btn btn-outline-secondary" href="{% url 'predict_cardio_view' record.pk %}">Check cardiology test</a>
-                    <a class="btn btn-outline-secondary" href="{% url 'predict_derm_view' record.pk %}">Check dermatology test</a>
+                    <a class="dropdown-item" href="{% url 'predict_blood_view' record.pk %}">Check latest blood test</a>
+                    <a class="dropdown-item" href="{% url 'predict_thyroid_view' record.pk %}">Check latest thyroid test</a>
+                    <a class="dropdown-item" href="{% url 'predict_body_fat_view' record.pk %}">Check body fat test</a>
+                    <a class="dropdown-item" href="{% url 'predict_cardio_view' record.pk %}">Check cardiology test</a>
+                    <a class="dropdown-item" href="{% url 'predict_derm_view' record.pk %}">Check dermatology test</a>
                 </div>
             </div>
             {% for prediction in model_predictions %}
@@ -346,10 +299,10 @@
                     <div class="card-body d-flex flex-row justify-content-between">
                         <div>
                             <h5 class="card-title">Prediction #{{prediction.id}}</h5>
-                            <p><strong>modelname:</strong> {{prediction.modelname}}</p>
-                            <p><strong>time:</strong> {{prediction.time}}</p>
-                            <p><strong>predicted_class:</strong> {{prediction.predicted_class}} - {{prediction.class_text}}</p>
-                            <p><strong>certainty:</strong> {{prediction.certainty}}</p>
+                            <p><strong>Model Name:</strong> {{prediction.modelname}}</p>
+                            <p><strong>Time:</strong> {{prediction.time}}</p>
+                            <p><strong>Predicted class:</strong> {{prediction.predicted_class}} - {{prediction.class_text}}</p>
+                            <p><strong>Certainty:</strong> {{prediction.certainty}}</p>
 
                         </div>
                     </div>
@@ -406,5 +359,6 @@ $(document).ready(function() {
         }
     });
 </script>
+
 
 {% endblock %}
