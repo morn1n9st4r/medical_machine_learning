@@ -3,11 +3,13 @@ import os
 import pickle
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 
 from airflow.providers.amazon.aws.operators.s3 import S3CreateObjectOperator
 from airflow.providers.amazon.aws.transfers.local_to_s3 import LocalFilesystemToS3Operator
+import psycopg2
 
 import xgboost as xgb
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -27,12 +29,15 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
+
 def fetch_data(**kwargs):
     print("Fetching data")
 
     thyroidDF = pd.read_csv('/opt/airflow/dags/data/thyroidDF.csv')
-    
     thyroidDF.to_csv("thyroidDF", index=False)
+
+
+
 
 def preprocess_data(**kwargs):
     print("Preprocessing data")
@@ -92,11 +97,8 @@ def preprocess_data(**kwargs):
 
 
 
-
-
 def train_model(**kwargs):
     print("Training model")
-
 
     thyroidDF = pd.read_csv("thyroidDF")
 
@@ -124,21 +126,29 @@ def train_model(**kwargs):
 
     xgb_clf = xgb.XGBClassifier(objective='multi:softmax', 
                                 num_class=3, 
-                                missing=1, 
-                                early_stopping_rounds=10, 
+                                missing=1,
                                 eval_metric=['merror','mlogloss'], 
                                 seed=42)
-    xgb_clf.fit(X_train, 
-                y_train,
-                verbose=0,
-                eval_set=[(X_train, y_train), (X_test, y_test)])
 
+    param_grid = {
+        'learning_rate': [0.01, 0.1, 0.2],
+        'max_depth': [3, 4, 5],
+        'n_estimators': [50, 100, 200]
+    }
+
+    grid_search = GridSearchCV(estimator=xgb_clf, param_grid=param_grid, scoring='accuracy', cv=3, verbose=3)
+    grid_search.fit(X_train, y_train)
+    print("Best Hyperparameters:", grid_search.best_params_)
+
+    best_xgb_clf = grid_search.best_estimator_
+    best_xgb_clf.fit(X_train, y_train)
 
     X_test.to_csv("X_test", index=False)
     y_test.to_csv("y_test", index=False)
 
     with open('xgb_thyroid.pkl', 'wb') as file:
-        pickle.dump(xgb_clf, file)
+        pickle.dump(best_xgb_clf, file)
+
 
 
 def validate_model(**kwargs):
@@ -152,6 +162,9 @@ def validate_model(**kwargs):
         xgb_clf = pickle.load(file)
 
         y_pred = xgb_clf.predict(X_test)
+        y_pred_df = pd.DataFrame({'target': y_pred})
+        y_pred_df.to_csv("y_pred", index=False)
+
         print('\n------------------ Confusion Matrix -----------------\n')
         print(confusion_matrix(y_test, y_pred))
 
@@ -174,14 +187,58 @@ def validate_model(**kwargs):
         print('\n--------------- Classification Report ---------------\n')
         print(classification_report(y_test, y_pred))
         print('---------------------- XGBoost ----------------------')
+    
 
 
+def upload_params(**kwargs):
+    print("Validating model")
+    
+    y_test = pd.read_csv("y_test")
+    y_pred = pd.read_csv("y_pred")
 
-def upload_to_s3(**kwargs):
-    print("Uploading to S3")
+    with open("/opt/airflow/xgb_thyroid.pkl", 'rb') as file:
+
+        xgb_clf = pickle.load(file)
+
+        conn = psycopg2.connect(
+            dbname='medicalmldb',
+            user='medicalmladmin',
+            password='Qwerty12345',
+            host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+            port='5432'
+        )
+        cur = conn.cursor()
+        date = datetime.now().strftime("%m_%d_%Y_%H_%M")
+
+        cur.execute("""INSERT INTO public.main_mlmodel (modeltype, traindate, parameters, val_accuracy) 
+                    VALUES (%s, %s,%s, %s)""",
+                    ('thyroid', datetime.now(), str(xgb_clf.get_xgb_params()), accuracy_score(y_test, y_pred)))
+        
+        with open('thyroid_' + date + '.pkl', 'wb') as file:
+            pickle.dump(xgb_clf, file)
+            
+        conn.commit()
+        cur.close()
+        conn.close()
 
 
-
+def upload_files_to_s3():
+    # Directory containing the files with the specified pattern
+    directory_path = '/opt/airflow/'
+    # Find files matching the pattern
+    matching_files = [file for file in os.listdir(directory_path) if file.startswith('thyroid_')]
+    # Upload matching files to S3
+    for file in matching_files:
+        upload_task = LocalFilesystemToS3Operator(
+            task_id=f'upload_{file}',
+            aws_conn_id='AWS_CONN',
+            filename=os.path.join(directory_path, file),
+            dest_bucket='medicalmlbucket',
+            dest_key=f'model/{file}',
+            replace=True,
+            dag=dag,
+        )
+        upload_task.execute(dict())
 
 
 with DAG(
@@ -190,6 +247,7 @@ with DAG(
     schedule_interval="@daily",
     catchup=False
 ) as dag:
+
 
     # Define tasks
     fetch_task = PythonOperator(
@@ -216,13 +274,37 @@ with DAG(
         dag=dag,
     )
 
-    upload_task = upload_task = LocalFilesystemToS3Operator(
-    task_id='upload_to_s3',
-    aws_conn_id='AWS_CONN',
-    filename='/opt/airflow/xgb_thyroid.pkl',
-    dest_bucket='medicalmlbucket',
-    dest_key='model/xgb_thyroid.pkl',
-    dag=dag,
-)
+    upload_params_task =  PythonOperator(
+        task_id='upload_params',
+        python_callable=upload_params,
+        dag=dag,
+    )
+
+    upload_task  = PythonOperator(
+        task_id='execute_upload',
+        python_callable=upload_files_to_s3,
+    )
+
+    remove_thyroid_csv_task = BashOperator(
+        task_id='remove_thyroid_csv',
+        bash_command='rm -f /opt/airflow/thyroid*.csv',
+        dag=dag,
+    )
+
+    remove_xgb_thyroid_pkl_task = BashOperator(
+        task_id='remove_xgb_thyroid_pkl',
+        bash_command='rm -f /opt/airflow/xgb_thyroid.pkl',
+        dag=dag,
+    )
+
+    remove_thyroid_pkl_task = BashOperator(
+        task_id='remove_thyroid_pkl',
+        bash_command='rm -f /opt/airflow/thyroid*.pkl',
+        dag=dag,
+    )
 
     fetch_task >> preprocess_task >> train_task >> validate_task >> upload_task
+    validate_task >> upload_params_task
+    upload_task >> remove_thyroid_csv_task
+    upload_task >> remove_xgb_thyroid_pkl_task
+    upload_task >> remove_thyroid_pkl_task
