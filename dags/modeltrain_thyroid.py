@@ -248,7 +248,6 @@ with DAG(
     catchup=False
 ) as dag:
 
-
     # Define tasks
     fetch_task = PythonOperator(
         task_id='fetch_data',
