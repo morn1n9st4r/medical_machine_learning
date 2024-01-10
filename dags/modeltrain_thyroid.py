@@ -242,7 +242,7 @@ def upload_files_to_s3():
 
 
 with DAG(
-    'train_model',
+    'train_thyroid_model',
     start_date=datetime(2023, 3, 21),
     schedule_interval="@daily",
     catchup=False
@@ -302,8 +302,8 @@ with DAG(
         dag=dag,
     )
 
-    fetch_task >> preprocess_task >> train_task >> validate_task >> upload_task
-    validate_task >> upload_params_task
-    upload_task >> remove_thyroid_csv_task
-    upload_task >> remove_xgb_thyroid_pkl_task
-    upload_task >> remove_thyroid_pkl_task
+    fetch_task >> preprocess_task >> train_task >> validate_task 
+    validate_task >> upload_params_task >> upload_task
+    remove_thyroid_csv_task >> fetch_task
+    remove_xgb_thyroid_pkl_task >> fetch_task
+    remove_thyroid_pkl_task >> fetch_task
