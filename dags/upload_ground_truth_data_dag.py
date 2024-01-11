@@ -21,18 +21,16 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-def download_from_s3(**kwargs):
+def download_from_s3(filename, **kwargs):
     hook = S3Hook(aws_conn_id='AWS_CONN')  # Specify your AWS connection ID
-    hook.download_file(bucket_name='medicalmlbucket', key='model/thyroidDF.csv', local_path='/opt/airflow/dags/')
-    files_to_rename = glob.glob('/opt/airflow/dags/airflow_tmp_*')
-
-    for src in files_to_rename:
-        file_name = os.path.basename(src)
-        dst = os.path.join('/opt/airflow/dags', 'thyroidDF.csv')
-        os.rename(src=src, dst=dst)
+    downloaded_name = hook.download_file(bucket_name='medicalmlbucket', key=f'model/{filename}', local_path='/opt/airflow/dags/')
+#
+    #file_name = os.path.basename(src)
+    dst = os.path.join('/opt/airflow/dags', 'thyroidDF.csv')
+    os.rename(src=downloaded_name, dst=dst)
 
 
-def upload():
+def upload(table_name):
 
     # Database connection parameters
     db_params = {
@@ -52,7 +50,7 @@ def upload():
         next(file)  # Skip the header row if it exists
         data = [tuple(None if cell == '' else cell for cell in line.strip().split(',')) for line in file]
 
-    target_table = 'thyroidDF'
+    target_table = table_name
     insert_sql = f"INSERT INTO {target_table} VALUES %s"
     execute_values(cur, insert_sql, data, page_size=10000) 
 
@@ -73,6 +71,7 @@ with DAG(
     download_from_s3_task = PythonOperator(
         task_id = 'download_thyroid_data',
         python_callable = download_from_s3,
+        op_kwargs={'filename': 'thyroidDF.csv'},
         dag=dag,
     )
 
@@ -86,6 +85,7 @@ with DAG(
     upload_task = PythonOperator(
         task_id = 'upload_thyroid_data',
         python_callable = upload,
+        op_kwargs={'table_name': 'thyroidDF'}, 
         dag=dag,
     )
 
