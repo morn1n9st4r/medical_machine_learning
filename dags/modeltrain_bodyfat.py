@@ -29,47 +29,24 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-
-def fetch_data(**kwargs):
-    print("Fetching data")
-
-    bodyfatDF = pd.read_csv('/opt/airflow/dags/data/bodyfat.csv')
-    bodyfatDF.to_csv("bodyfat", index=False)
-
-
-
-
-def preprocess_data(**kwargs):
-    print("Preprocessing data")
-
-    bodyfatDF = pd.read_csv("bodyfat")
-
-    bodyfatDF.drop(columns=['Original'], inplace=True)
-
-    bodyfatDF['Sex'] = bodyfatDF['Sex'].replace({'M': 'Male', 'F': 'Female'})
-
-    print("NaN values:")
-
-    sex_mapping = {'Male': 1, 'Female': 0}
-
-    bodyfatDF['Sex'] = bodyfatDF['Sex'].map(sex_mapping)
-
-    bodyfatDF.to_csv("bodyfatDF", index=False)
-
-
-
 def train_model(**kwargs):
     print("Training model")
 
-    bodyfatDF = pd.read_csv("bodyfatDF")
+    conn = psycopg2.connect(
+        dbname='medicalmldb',
+        user='medicalmladmin',
+        password='Qwerty12345',
+        host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        port='5432'
+    )
+
+    bodyfatDF = pd.read_sql_query('select * from bodyfatDF',con=conn)
 
 
-    X = bodyfatDF.drop(columns='BodyFat')
-    y = bodyfatDF['BodyFat']
+    X = bodyfatDF.drop(columns='bodyfat')
+    y = bodyfatDF['bodyfat']
 
     from sklearn.preprocessing import StandardScaler
-
-
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -104,7 +81,7 @@ def train_model(**kwargs):
     best_model.fit(x_train_scaled, y_train)
 
     y_pred = best_model.predict(x_test_scaled)
-    y_pred_df = pd.DataFrame({'BodyFat': y_pred})
+    y_pred_df = pd.DataFrame({'bodyfat': y_pred})
     y_pred_df.to_csv("y_pred", index=False)
 
     y_test.to_csv("y_test", index=False)
@@ -129,7 +106,6 @@ def validate_model(**kwargs):
     print(f"Test | Mean Squared Error: {mse_test} | Mean Absolute Error: {mae_test}")
     print('---------------------- RandomForestRegressor ----------------------')
     
-
 
 def upload_params(**kwargs):
     print("Validating model")
@@ -189,19 +165,6 @@ with DAG(
     catchup=False
 ) as dag:
 
-    # Define tasks
-    fetch_task = PythonOperator(
-        task_id='fetch_data',
-        python_callable=fetch_data,
-        dag=dag,
-    )
-
-    preprocess_task = PythonOperator(
-        task_id='preprocess_data',
-        python_callable=preprocess_data,
-        dag=dag,
-    )
-
     train_task = PythonOperator(
         task_id='train_model',
         python_callable=train_model,
@@ -243,8 +206,8 @@ with DAG(
         dag=dag,
     )
 
-    fetch_task >> preprocess_task >> train_task >> validate_task 
+    train_task >> validate_task 
     validate_task >> upload_params_task >> upload_task
-    remove_bodyfat_csv_task >> fetch_task
-    remove_bodyfat_pkl_task >> fetch_task
-    remove_bodyfat_date_pkl >> fetch_task
+    remove_bodyfat_csv_task >> train_task
+    remove_bodyfat_pkl_task >> train_task
+    remove_bodyfat_date_pkl >> train_task

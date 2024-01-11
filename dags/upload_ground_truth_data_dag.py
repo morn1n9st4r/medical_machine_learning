@@ -1,16 +1,11 @@
-import glob
 import os
 from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 from datetime import datetime, timedelta
-
 from airflow.hooks.S3_hook import S3Hook
 
-from airflow.providers.amazon.aws.transfers.s3_to_sql import S3ToSqlOperator
-import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
@@ -24,9 +19,7 @@ default_args = {
 def download_from_s3(filename, **kwargs):
     hook = S3Hook(aws_conn_id='AWS_CONN')  # Specify your AWS connection ID
     downloaded_name = hook.download_file(bucket_name='medicalmlbucket', key=f'model/{filename}', local_path='/opt/airflow/dags/')
-#
-    #file_name = os.path.basename(src)
-    dst = os.path.join('/opt/airflow/dags', 'thyroidDF.csv')
+    dst = os.path.join('/opt/airflow/dags', filename)
     os.rename(src=downloaded_name, dst=dst)
 
 
@@ -41,7 +34,7 @@ def upload(table_name):
         'port': 5432
     }
 
-    csv_file_path = '/opt/airflow/dags/thyroidDF.csv'
+    csv_file_path = f'/opt/airflow/dags/{table_name}.csv'
 
     conn = psycopg2.connect(**db_params)
     cur = conn.cursor()
@@ -68,6 +61,7 @@ with DAG(
     catchup=False
 ) as dag:
 
+    #task thyroid
     download_from_s3_task = PythonOperator(
         task_id = 'download_thyroid_data',
         python_callable = download_from_s3,
@@ -96,5 +90,41 @@ with DAG(
         dag=dag,
     )
 
+
+
+
+    download_from_s3_bodyfat_task = PythonOperator(
+        task_id = 'download_from_s3_bodyfat',
+        python_callable = download_from_s3,
+        op_kwargs={'filename': 'bodyfatDF.csv'},
+        dag=dag,
+    )
+
+    create_bodyfat_table_task = PostgresOperator(
+        task_id='create_bodyfat_table',
+        postgres_conn_id='aws_rds',
+        sql = 'create_bodyfat_table.sql',
+        dag=dag,
+    )
+
+    upload_bodyfat_task = PythonOperator(
+        task_id = 'upload_bodyfat_data',
+        python_callable = upload,
+        op_kwargs={'table_name': 'bodyfatDF'}, 
+        dag=dag,
+    )
+
+    transform_bodyfat_task = PostgresOperator(
+        task_id='transform_bodyfat',
+        postgres_conn_id='aws_rds',
+        sql = 'transform_bodyfat.sql',
+        dag=dag,
+    )
+
+
+
+
+
     download_from_s3_task >> create_thyroid_table_task >> upload_task >> transform_thyroid_task
+    download_from_s3_bodyfat_task >> create_bodyfat_table_task >> upload_bodyfat_task >> transform_bodyfat_task
     #>> validateGX
