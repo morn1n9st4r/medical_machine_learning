@@ -29,78 +29,20 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-
-def fetch_data(**kwargs):
-    print("Fetching data")
-
-    thyroidDF = pd.read_csv('/opt/airflow/dags/data/thyroidDF.csv')
-    thyroidDF.to_csv("thyroidDF", index=False)
-
-
-
-
-def preprocess_data(**kwargs):
-    print("Preprocessing data")
-
-    thyroidDF = pd.read_csv("thyroidDF")
-
-    # dropping redundant attributes from thyroidDF dataset
-    thyroidDF.drop(['TSH_measured', 'T3_measured', 'TT4_measured', 'T4U_measured', 'FTI_measured', 'TBG_measured', 'patient_id', 'referral_source'], axis=1, inplace=True)
-
-    # re-mapping target vaues to diagnostic groups
-    diagnoses = {'-': 'negative',
-                'A': 'hyperthyroid', 
-                'B': 'hyperthyroid', 
-                'C': 'hyperthyroid', 
-                'D': 'hyperthyroid',
-                'E': 'hypothyroid', 
-                'F': 'hypothyroid', 
-                'G': 'hypothyroid', 
-                'H': 'hypothyroid'}
-
-    thyroidDF['target'] = thyroidDF['target'].map(diagnoses) # re-mapping
-
-    # dropping observations with 'target' null after re-mapping
-    thyroidDF.dropna(subset=['target'], inplace=True) 
-
-    # dataset initial summary
-    thyroidDF.info()
-    # changing age of observations with ('age' > 100) to null
-    thyroidDF['age'] = np.where((thyroidDF.age > 100), np.nan, thyroidDF.age)
-
-    missingness = thyroidDF.isnull().sum().sum() / thyroidDF.count().sum()
-    print('Overall Missingness of thyroidDF is: {:.2f}%'.format(missingness * 100))
-
-    # Create table for missing data analysis
-    def missing_table(df):
-        total = df.isnull().sum().sort_values(ascending=False)
-        percent = (df.isnull().sum()/df.isnull().count()).sort_values(ascending=False)
-        missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
-        return missing_data
-
-    # Analyze missing data
-    missing_table(thyroidDF).head(10)
-
-    thyroidDF.drop(['TBG'], axis=1, inplace=True)
-    thyroidDF.dropna(subset=['age'], inplace=True)
-    thyroidDF['sex'] = np.where((thyroidDF.sex.isnull()) & (thyroidDF.pregnant == 't'), 'F', thyroidDF.sex)
-
-
-    missingness = thyroidDF.isnull().sum().sum() / thyroidDF.count().sum()
-    thyroidDF['n_missing'] = thyroidDF.isnull().sum(axis=1)
-    thyroidDF.drop(thyroidDF.index[thyroidDF['n_missing'] > 2], inplace=True)
-
-
-    thyroidDF = thyroidDF[['T3', 'TSH','FTI','T4U','TT4','goitre', 'target', 'sex', 'age']]
-
-    thyroidDF.to_csv("thyroidDF", index=False)
-
-
-
 def train_model(**kwargs):
     print("Training model")
 
-    thyroidDF = pd.read_csv("thyroidDF")
+    #thyroidDF = pd.read_csv("thyroidDF")
+
+    conn = psycopg2.connect(
+        dbname='medicalmldb',
+        user='medicalmladmin',
+        password='Qwerty12345',
+        host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        port='5432'
+    )
+
+    thyroidDF = pd.read_sql_query('select * from thyroidDF',con=conn)
 
     thyroidDF.replace('f', 0, inplace=True)
     thyroidDF.replace('t', 1, inplace=True)
@@ -248,18 +190,6 @@ with DAG(
     catchup=False
 ) as dag:
 
-    # Define tasks
-    fetch_task = PythonOperator(
-        task_id='fetch_data',
-        python_callable=fetch_data,
-        dag=dag,
-    )
-
-    preprocess_task = PythonOperator(
-        task_id='preprocess_data',
-        python_callable=preprocess_data,
-        dag=dag,
-    )
 
     train_task = PythonOperator(
         task_id='train_model',
@@ -302,8 +232,8 @@ with DAG(
         dag=dag,
     )
 
-    fetch_task >> preprocess_task >> train_task >> validate_task 
+    train_task >> validate_task 
     validate_task >> upload_params_task >> upload_task
-    remove_thyroid_csv_task >> fetch_task
-    remove_xgb_thyroid_pkl_task >> fetch_task
-    remove_thyroid_pkl_task >> fetch_task
+    remove_thyroid_csv_task >> train_task
+    remove_xgb_thyroid_pkl_task >> train_task
+    remove_thyroid_pkl_task >> train_task
