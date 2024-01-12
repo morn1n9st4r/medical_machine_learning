@@ -1,0 +1,16 @@
+CREATE TABLE bloodDF (
+    id VARCHAR(255),
+    target VARCHAR(255),
+    Age INTEGER,
+    sex VARCHAR(4),
+    ALB FLOAT,
+    ALP FLOAT,
+    ALT FLOAT,
+    AST FLOAT,
+    BIL FLOAT,
+    CHE FLOAT,
+    CHOL FLOAT,
+    CREA FLOAT,
+    GGT FLOAT,
+    PROT FLOAT
+);
