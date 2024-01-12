@@ -1,5 +1,5 @@
 -- Rename the 'Category' column to 'target'
-ALTER TABLE bloodDF RENAME COLUMN targetet TO target;
+ALTER TABLE bloodDF RENAME COLUMN target TO target;
 
 ---- Update values in the 'target' column
 UPDATE bloodDF SET target = '0' WHERE target = '"0=Blood Donor"';
