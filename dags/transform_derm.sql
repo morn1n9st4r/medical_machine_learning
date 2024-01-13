@@ -1,0 +1,10 @@
+UPDATE dermDF
+SET age = NULL
+WHERE age = '?';
+
+
+DELETE FROM dermDF
+WHERE age IS NULL;
+
+UPDATE dermDF
+SET age = CAST(age AS INTEGER);

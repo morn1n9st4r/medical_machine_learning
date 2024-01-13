@@ -55,9 +55,9 @@ def upload(table_name):
 
 
 with DAG(
-    'move_thyroid_fround_training_data',
+    'move_ground_training_data',
     start_date=datetime(2023, 3, 21),
-    schedule_interval="@daily",
+    schedule_interval="@once",
     catchup=False
 ) as dag:
 
@@ -91,8 +91,7 @@ with DAG(
     )
 
 
-
-
+    #bodyfat
     download_from_s3_bodyfat_task = PythonOperator(
         task_id = 'download_from_s3_bodyfat',
         python_callable = download_from_s3,
@@ -122,9 +121,70 @@ with DAG(
     )
 
 
+    #blood
+    download_from_s3_blood_task = PythonOperator(
+        task_id = 'download_from_s3_blood',
+        python_callable = download_from_s3,
+        op_kwargs={'filename': 'bloodDF.csv'},
+        dag=dag,
+    )
+
+    create_blood_table_task = PostgresOperator(
+        task_id='create_blood_table',
+        postgres_conn_id='aws_rds',
+        sql = 'create_blood_table.sql',
+        dag=dag,
+    )
+
+    upload_blood_task = PythonOperator(
+        task_id = 'upload_blood_data',
+        python_callable = upload,
+        op_kwargs={'table_name': 'bloodDF'}, 
+        dag=dag,
+    )
+
+    transform_blood_task = PostgresOperator(
+        task_id='transform_blood',
+        postgres_conn_id='aws_rds',
+        sql = 'transform_blood.sql',
+        dag=dag,
+    )
+
+
+    #derm
+    download_from_s3_derm_task = PythonOperator(
+        task_id = 'download_from_s3_derm',
+        python_callable = download_from_s3,
+        op_kwargs={'filename': 'dermDF.csv'},
+        dag=dag,
+    )
+
+    create_derm_table_task = PostgresOperator(
+        task_id='create_derm_table',
+        postgres_conn_id='aws_rds',
+        sql = 'create_derm_table.sql',
+        dag=dag,
+    )
+
+    upload_derm_task = PythonOperator(
+        task_id = 'upload_derm_data',
+        python_callable = upload,
+        op_kwargs={'table_name': 'dermDF'}, 
+        dag=dag,
+    )
+
+    transform_derm_task = PostgresOperator(
+        task_id='transform_derm',
+        postgres_conn_id='aws_rds',
+        sql = 'transform_derm.sql',
+        dag=dag,
+    )
 
 
 
-    download_from_s3_task >> create_thyroid_table_task >> upload_task >> transform_thyroid_task
-    download_from_s3_bodyfat_task >> create_bodyfat_table_task >> upload_bodyfat_task >> transform_bodyfat_task
-    #>> validateGX
+
+    download_from_s3_task >> create_thyroid_table_task >> upload_task >> transform_thyroid_task #>> validateGX
+    download_from_s3_bodyfat_task >> create_bodyfat_table_task >> upload_bodyfat_task >> transform_bodyfat_task #>> validateGX
+    download_from_s3_blood_task >> create_blood_table_task >> upload_blood_task >> transform_blood_task #>> validateGX
+    download_from_s3_derm_task >> create_derm_table_task >> upload_derm_task >> transform_derm_task #>> validateGX
+
