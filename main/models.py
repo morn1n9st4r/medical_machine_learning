@@ -192,6 +192,8 @@ class PatientDiagnosis(MedicalRecordsABC):
     details = models.CharField()
     tags = models.CharField(max_length=2, choices=TAGS_CHOICES)
 
+    cured = models.BooleanField(default=False)
+
     examinations = models.CharField()
 
     def __str__(self):
@@ -227,6 +229,7 @@ class MLModel(models.Model):
     modeltype = models.CharField(choices=MODELTYPE_CHOICES)
     traindate = models.DateField()
     parameters = models.CharField()
+    val_accuracy = models.FloatField()
 
 
 
