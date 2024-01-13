@@ -3,8 +3,14 @@ FROM apache/airflow:2.7.3-python3.10
 USER airflow
 
 # Install additional Python modules
-RUN pip install --upgrade pip
+RUN pip3 install --upgrade pip
 COPY ./requirements_af.txt .
 RUN pip3 install -r requirements_af.txt
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
+RUN apt-get -y install curl
+RUN apt-get install libgomp1
 
 USER airflow
