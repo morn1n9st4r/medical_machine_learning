@@ -17,15 +17,19 @@ default_args = {
 }
 
 def download_from_s3(filename, **kwargs):
-    hook = S3Hook(aws_conn_id='AWS_CONN')  # Specify your AWS connection ID
+    hook = S3Hook(aws_conn_id='AWS_CONN')
     downloaded_name = hook.download_file(bucket_name='medicalmlbucket', key=f'model/{filename}', local_path='/opt/airflow/dags/')
     dst = os.path.join('/opt/airflow/dags', filename)
     os.rename(src=downloaded_name, dst=dst)
 
 
-def upload(table_name):
+def upload(table_name, filename=None):
 
-    # Database connection parameters
+    # there is no way to make a one default param equalts to another param, even if it is mandatory one
+    # it is used for heardDF table, because it uses _temp table to load data from csv, not main one
+    if filename is None:
+        filename = table_name
+
     db_params = {
         'dbname': 'medicalmldb',
         'user': 'medicalmladmin',
@@ -34,13 +38,13 @@ def upload(table_name):
         'port': 5432
     }
 
-    csv_file_path = f'/opt/airflow/dags/{table_name}.csv'
+    csv_file_path = f'/opt/airflow/dags/{filename}.csv'
 
     conn = psycopg2.connect(**db_params)
     cur = conn.cursor()
 
     with open(csv_file_path, 'r') as file:
-        next(file)  # Skip the header row if it exists
+        next(file)  # Skip the header row
         data = [tuple(None if cell == '' else cell for cell in line.strip().split(',')) for line in file]
 
     target_table = table_name
@@ -182,9 +186,41 @@ with DAG(
 
 
 
+    #heart
+    download_from_s3_heart_task = PythonOperator(
+        task_id = 'download_from_s3_heart',
+        python_callable = download_from_s3,
+        op_kwargs={'filename': 'heartDF.csv'},
+        dag=dag,
+    )
+
+    create_heart_table_task = PostgresOperator(
+        task_id='create_heart_table',
+        postgres_conn_id='aws_rds',
+        sql = 'create_heart_table.sql',
+        dag=dag,
+    )
+
+    upload_heart_task = PythonOperator(
+        task_id = 'upload_heart_data',
+        python_callable = upload,
+        op_kwargs={'table_name': 'heartDF_temp', 'filename': 'heartDF'}, 
+        dag=dag,
+    )
+
+    transform_heart_task = PostgresOperator(
+        task_id='transform_heart',
+        postgres_conn_id='aws_rds',
+        sql = 'transform_heart.sql',
+        dag=dag,
+    )
+
+
+
 
     download_from_s3_task >> create_thyroid_table_task >> upload_task >> transform_thyroid_task #>> validateGX
     download_from_s3_bodyfat_task >> create_bodyfat_table_task >> upload_bodyfat_task >> transform_bodyfat_task #>> validateGX
     download_from_s3_blood_task >> create_blood_table_task >> upload_blood_task >> transform_blood_task #>> validateGX
     download_from_s3_derm_task >> create_derm_table_task >> upload_derm_task >> transform_derm_task #>> validateGX
+    download_from_s3_heart_task >> create_heart_table_task >> upload_heart_task >> transform_heart_task #>> validateGX
 
