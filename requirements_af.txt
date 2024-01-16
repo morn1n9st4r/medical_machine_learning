@@ -1,5 +1,11 @@
 numpy
 pandas
 xgboost
+lightgbm
 scikit-learn
+apache-airflow
 apache-airflow-providers-amazon
+psycopg2-binary
+keras
+tensorflow
+airflow-provider-great-expectations

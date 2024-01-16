@@ -1,0 +1,23 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "train_blooddb",
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "target",
+        "mostly": 1.0
+      },
+      "meta": {
+        "notes": {
+          "content": "values could not be null",
+          "format": "markdown"
+        }
+      }
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.8"
+  }
+}
