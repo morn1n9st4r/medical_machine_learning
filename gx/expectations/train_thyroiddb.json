@@ -1,0 +1,73 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "train_thyroiddb",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_column_count_to_equal",
+      "kwargs": {
+        "value": 9
+      },
+      "meta": {
+        "notes": {
+          "content": "The table should have exactly 9 columns.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "age",
+        "type_": "INTEGER"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should be of integer type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "sex",
+        "value_set": ["M", "F"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'sex' should be in the set ['M', 'F'].",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "target",
+        "value_set": ["hypothyroid", "hyperthyroid", "negative"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'target' should be in the set ['hypothyroid', 'hyperthyroid', 'negative'].",
+          "format": "markdown"
+        }
+      }
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.8"
+  }
+}
