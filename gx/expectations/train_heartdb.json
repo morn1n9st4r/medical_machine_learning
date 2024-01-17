@@ -1,0 +1,185 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "train_heartdb",
+  "expectations":[
+    {
+      "expectation_type": "expect_table_column_count_to_equal",
+      "kwargs": {
+        "value": 13
+      },
+      "meta": {
+        "notes": {
+          "content": "The table should have exactly 13 columns.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'age' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "sex"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'sex' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "age",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "sex",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'sex' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "heart_disease",
+        "value_set": ["Presence", "Absence"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'heart_disease' should be in the set ['Present', 'Absent'].",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "chest_pain_type"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'chest_pain_type' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "bp"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'bp' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "fbs_over_120"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'fbs_over_120' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "chest_pain_type",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'chest_pain_type' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "bp",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'bp' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+  
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "st_depression"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'st_depression' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "st_depression",
+        "type_list": ["DOUBLE_PRECISION"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'st_depression' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.8"
+  }
+}
