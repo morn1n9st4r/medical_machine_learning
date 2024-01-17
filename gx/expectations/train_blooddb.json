@@ -3,14 +3,388 @@
   "expectation_suite_name": "train_blooddb",
   "expectations": [
     {
-      "expectation_type": "expect_column_values_to_not_be_null",
+      "expectation_type": "expect_table_column_count_to_equal",
       "kwargs": {
-        "column": "target",
-        "mostly": 1.0
+        "value": 13
       },
       "meta": {
         "notes": {
-          "content": "values could not be null",
+          "content": "The table should have exactly 13 columns.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "target"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'target' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'age' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "sex"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'sex' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "alb"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'alb' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "alp"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'alp' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "alt"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'alt' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "ast"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'ast' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "bil"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'bil' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "che"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'che' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "chol"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'chol' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "crea"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'crea' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "ggt"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'ggt' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "prot"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'prot' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "target"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'target' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "sex"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'sex' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "age",
+        "type_": "INTEGER"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should be of integer type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "alb",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'alb' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "alp",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'alp' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "alt",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'alt' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "ast",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'ast' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "bil",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'bil' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "che",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'che' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "chol",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'chol' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "crea",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'crea' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "ggt",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'ggt' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "prot",
+        "type_": "DOUBLE_PRECISION"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'prot' should be of DOUBLE_PRECISION type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "age",
+        "min_value": 0,
+        "max_value": 120
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should be between 0 and 120.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "sex",
+        "value_set": [1, 0]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'sex' should be either 'Male' or 'Female'.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "target",
+        "value_set": [0, 1, 2, 3]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'target' should be in the set 0, 1, 2, 3.",
           "format": "markdown"
         }
       }
