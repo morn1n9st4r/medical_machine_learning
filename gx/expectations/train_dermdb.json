@@ -1,0 +1,259 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "train_dermdb",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_column_count_to_equal",
+      "kwargs": {
+        "value": 35
+      },
+      "meta": {
+        "notes": {
+          "content": "The table should have exactly 35 columns.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "erythema"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'erythema' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "scaling"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'scaling' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "erythema"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'erythema' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "erythema",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'erythema' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "scaling"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'scaling' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "scaling",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'scaling' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+  
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "age"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "age",
+        "type_list": ["VARCHAR"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'age' should be of string type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "class"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'class' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "class",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'class' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "definite_borders"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'definite_borders' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "itching"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'itching' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+        "column": "koebner_phenomenon"
+      },
+      "meta": {
+        "notes": {
+          "content": "The column 'koebner_phenomenon' should exist in the dataset.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "definite_borders"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'definite_borders' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "definite_borders",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'definite_borders' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "itching"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'itching' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+        "column": "itching",
+        "type_list": ["INTEGER"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'itching' should be of INTEGEReger type.",
+          "format": "markdown"
+        }
+      }
+    },
+  
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "class"
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'class' should not be null (missing).",
+          "format": "markdown"
+        }
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "class",
+        "value_set": ["1", "2", "3", "4", "5", "6"]
+      },
+      "meta": {
+        "notes": {
+          "content": "The values in 'class' should be in the set ['1', '2', '3', '4', '5', '6'].",
+          "format": "markdown"
+        }
+      }
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.8"
+  }
+}
