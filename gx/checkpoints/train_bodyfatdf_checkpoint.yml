@@ -1,4 +1,4 @@
-name: train_thyroiddf_checkpoint
+name: train_bodyfatdf_checkpoint
 config_version: 1.0
 template_name:
 module_name: great_expectations.checkpoint
@@ -22,10 +22,10 @@ validations:
   - batch_request:
       datasource_name: rds_medicalmldb
       data_connector_name: default_inferred_data_connector_name
-      data_asset_name: public.thyroiddf
+      data_asset_name: public.bodyfatdf
       data_connector_query:
         index: -1
-    expectation_suite_name: train_thyroiddb
+    expectation_suite_name: train_bodyfatdb
 profilers: []
 ge_cloud_id:
 expectation_suite_ge_cloud_id:

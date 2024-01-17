@@ -1,0 +1,156 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "train_bodyfatdb",
+  "expectations": [{
+    "expectation_type": "expect_table_column_count_to_equal",
+    "kwargs": {
+      "value": 15
+    },
+    "meta": {
+      "notes": {
+        "content": "The table should have exactly 16 columns.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_to_exist",
+    "kwargs": {
+      "column": "bodyfat"
+    },
+    "meta": {
+      "notes": {
+        "content": "The column 'bodyfat' should exist in the dataset.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_not_be_null",
+    "kwargs": {
+      "column": "bodyfat"
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'bodyfat' should not be null (missing).",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_be_of_type",
+    "kwargs": {
+      "column": "bodyfat",
+      "type_": "DOUBLE_PRECISION"
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'bodyfat' should be of float type.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_to_exist",
+    "kwargs": {
+      "column": "age"
+    },
+    "meta": {
+      "notes": {
+        "content": "The column 'age' should exist in the dataset.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_not_be_null",
+    "kwargs": {
+      "column": "age"
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'age' should not be null (missing).",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_be_of_type",
+    "kwargs": {
+      "column": "age",
+      "type_": "INTEGER"
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'age' should be of integer type.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_to_exist",
+    "kwargs": {
+      "column": "sex"
+    },
+    "meta": {
+      "notes": {
+        "content": "The column 'sex' should exist in the dataset.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_not_be_null",
+    "kwargs": {
+      "column": "sex"
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'sex' should not be null (missing).",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_be_in_set",
+    "kwargs": {
+      "column": "sex",
+      "value_set": ["1", "0"]
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'sex' should be in the set 0, 1.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_to_exist",
+    "kwargs": {
+      "column": "height"
+    },
+    "meta": {
+      "notes": {
+        "content": "The column 'height' should exist in the dataset.",
+        "format": "markdown"
+      }
+    }
+  },
+  {
+    "expectation_type": "expect_column_values_to_not_be_null",
+    "kwargs": {
+      "column": "height"
+    },
+    "meta": {
+      "notes": {
+        "content": "The values in 'height' should not be null (missing).",
+        "format": "markdown"
+      }
+    }
+  }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.8"
+  }
+}
