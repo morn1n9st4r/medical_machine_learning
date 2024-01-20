@@ -1,4 +1,12 @@
-select pbr.gender, (CURRENT_DATE - pbr.date_of_birth)/365 AS age, '1' as class,
+select pbr.gender, (CURRENT_DATE - pbr.date_of_birth)/365 AS age,
+	case 
+		when pui.disease_name like '%psoriasis%' then 1
+		when pui.disease_name like '%seborrheic dermatitis%' then 2
+		when pui.disease_name like '%lichen planus%' then 3
+		when pui.disease_name like '%pityriasis rosea%' then 4
+		when pui.disease_name like '%chronic dermatitis%' then 5
+		when pui.disease_name like '%pityriasis trichosanthes%' then 6
+	end as class,
     pdt.erythema,
     pdt.scaling,
     pdt.definite_borders,
@@ -35,8 +43,10 @@ select pbr.gender, (CURRENT_DATE - pbr.date_of_birth)/365 AS age, '1' as class,
 from main_patientdermatologytest pdt
 join main_patientbaserecord pbr
 on pbr.id = pdt.patient_id
-where pdt.id in (
-	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid
+join (
+	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid, pd.disease_name
 	from main_patientdiagnosis pd
 	where pd.tags = 'SD'
-)
+) pui
+on pdt.id = pui.parsed_uuid
+
