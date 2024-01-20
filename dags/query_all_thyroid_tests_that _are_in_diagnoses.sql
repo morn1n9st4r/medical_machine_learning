@@ -1,4 +1,8 @@
-select pbr.gender, (CURRENT_DATE - pbr.date_of_birth)/365 AS age, 'hypothyroid' as target,
+select pbr.gender, (CURRENT_DATE - pbr.date_of_birth)/365 AS age,
+	case 
+		when pui.disease_name like '%hypothyroid%' then 'hypothyroid'
+		when pui.disease_name like '%hyperthyroid%' then 'hyperthyroid'
+	end as target,
     ptt.goitre,
     ptt.t4u,
     ptt.tt4,
@@ -8,8 +12,11 @@ select pbr.gender, (CURRENT_DATE - pbr.date_of_birth)/365 AS age, 'hypothyroid' 
 from main_patientthyroidtest ptt
 join main_patientbaserecord pbr
 on pbr.id = ptt.patient_id
-where ptt.id in (
-	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid
+join (
+	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid, pd.disease_name
 	from main_patientdiagnosis pd
 	where pd.tags = 'EN'
-)
+) pui
+on ptt.id = pui.parsed_uuid
+
+
