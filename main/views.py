@@ -355,10 +355,10 @@ def add_record(request, record_id, test_type):
                 patient_diagnoses = PatientDiagnosis.objects.filter(patient=patient_record.pk)
                 for diagnosis in patient_diagnoses:
                     dynamic_html_content += f'''
-                        <div class="card mt-2" id="diagnosis_{diagnosis.shortened_id}">
+                        <div class="card mt-2" id="diagnosis_{diagnosis.id}">
                             <div class="card-body d-flex flex-row justify-content-between">
                                 <div>
-                                    <h5 class="card-title">Diagnosis #{diagnosis.shortened_id}</h5>
+                                    <h5 class="card-title">Diagnosis #{diagnosis.id}</h5>
                                     <p><strong>date:</strong> {diagnosis.date}</p>
                                     <p><strong>disease_name:</strong> {diagnosis.disease_name}</p>
                                     <p><strong>severity:</strong> {diagnosis.severity}</p>
@@ -416,7 +416,7 @@ def update_examinations(request, record_id, diagnosis_id):
         else:
             form = ExaminationsForm()
 
-            present_exams_shortened_ids = patient_diagnosis.examinations.split(", ")
+            present_exams_ids = patient_diagnosis.examinations.split(", ")
             cardiologist_examinations = PatientAnalysisCardiologist.objects.filter(patient=patient_record.pk)
             blood_tests = PatientBloodTest.objects.filter(patient=patient_record.pk)
             thyroid_tests = PatientThyroidTest.objects.filter(patient=patient_record.pk)
@@ -425,15 +425,15 @@ def update_examinations(request, record_id, diagnosis_id):
             unsorted_medical_examinations = list(chain(cardiologist_examinations, blood_tests, thyroid_tests, derm_tests, bodyfat_tests))
             medical_examinations = sorted(unsorted_medical_examinations, key=attrgetter('date'), reverse=True)
             
-            filtered_medical_examinations = [exam for exam in medical_examinations if exam.shortened_id not in present_exams_shortened_ids]
+            filtered_medical_examinations = [exam for exam in medical_examinations if exam.id not in present_exams_ids]
             dynamic_html_content = ''
             for exam in filtered_medical_examinations:
                 if exam.get_model_type() == "PatientAnalysisCardiologist":
                     dynamic_html_content += f'''  
-                        <div class="card mt-2"  id="examination_{{exam.shortened_id}}">
+                        <div class="card mt-2"  id="examination_{{exam.id}}">
                             <div class="card-body d-flex flex-row justify-content-between">
                                 <div>
-                                    <h5 class="card-title">Cardiologist test #{exam.shortened_id}</h5>
+                                    <h5 class="card-title">Cardiologist test #{exam.id}</h5>
                                     <p><strong>date:</strong> {exam.date}</p>
                                     <p><strong>Blood Pressure:</strong> {exam.bp}</p>
                                     <p><strong>Type of pain:</strong> {exam.type_of_pain}</p>
@@ -442,10 +442,10 @@ def update_examinations(request, record_id, diagnosis_id):
                         </div>'''
                 elif exam.get_model_type() == "PatientBlood":
                     dynamic_html_content += f'''    
-                        <div class="card mt-2"  id="examination_{exam.shortened_id}">
+                        <div class="card mt-2"  id="examination_{exam.id}">
                             <div class="card-body d-flex flex-row justify-content-between">
                                 <div>
-                                    <h5 class="card-title">Blood test #{exam.shortened_id}</h5>
+                                    <h5 class="card-title">Blood test #{exam.id}</h5>
                                     <p><strong>date:</strong> {exam.date}</p>
                                     <p><strong>alb:</strong> {exam.alb}</p>
                                     <p><strong>chol:</strong> {exam.chol}</p>
@@ -455,10 +455,10 @@ def update_examinations(request, record_id, diagnosis_id):
                         </div>'''
                 elif exam.get_model_type() == "PatientBodyFat":
                     dynamic_html_content += f'''    
-                        <div class="card mt-2" id="examination_{exam.shortened_id}">
+                        <div class="card mt-2" id="examination_{exam.id}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Body measures test #{exam.shortened_id}</h5> 
+                                <h5 class="card-title">Body measures test #{exam.id}</h5> 
                                 <p><strong>date:</strong> {exam.date}</p>
                                 <p><strong>height:</strong> {exam.height}</p>
                                 <p><strong>weight:</strong> {exam.weight}/p>
@@ -469,10 +469,10 @@ def update_examinations(request, record_id, diagnosis_id):
                     </div>'''
                 elif exam.get_model_type() == "PatientThyroid":
                     dynamic_html_content += f'''    
-                        <div class="card mt-2" id="examination_{exam.shortened_id}">
+                        <div class="card mt-2" id="examination_{exam.id}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Thyroid test #{exam.shortened_id}</h5> 
+                                <h5 class="card-title">Thyroid test #{exam.id}</h5> 
                                 <p><strong>date:</strong> {exam.date}</p>
                                 <p><strong>tsh:</strong> {exam.tsh}</p>
                                 <p><strong>t3:</strong> {exam.t3}</p>
@@ -482,10 +482,10 @@ def update_examinations(request, record_id, diagnosis_id):
                     </div>'''
                 elif exam.get_model_type() == "PatientDermatology":
                     dynamic_html_content += f'''    
-                        <div class="card mt-2" id="examination_{exam.shortened_id}">
+                        <div class="card mt-2" id="examination_{exam.id}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Dermatology test #{exam.shortened_id}</h5> 
+                                <h5 class="card-title">Dermatology test #{exam.id}</h5> 
                                 <p><strong>date:</strong> {exam.date}</p>
                                 <p><strong>scaling:</strong> {exam.scaling}</p>
                                 <p><strong>definite_borders:</strong> {exam.definite_borders}</p>

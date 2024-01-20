@@ -54,14 +54,6 @@ class MedicalRecordsABC(models.Model):
     class Meta:
         abstract = True
 
-    @property
-    def shortened_id(self):
-        uuid_bytes = self.id.bytes
-        md5_digest = hashlib.md5(uuid_bytes).digest()
-        shortened_value = md5_digest[:8]
-        shortened_hex = shortened_value.hex()
-        return shortened_hex
-
 
 class PatientAnalysisCardiologist(MedicalRecordsABC):
 

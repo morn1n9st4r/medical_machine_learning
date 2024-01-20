@@ -95,9 +95,9 @@
             {% for examination in medical_examinations %}
                 {% if examination.get_model_type == 'PatientAnalysisCardiologist' %}
                 <div class="tab-pane fade show active">
-                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                    <div class="card mt-2" id="examination_{{examination.id}}">
                         <div class="card-body">
-                            <h5 class="card-title">Cardiologist Test #{{examination.shortened_id}}</h5>
+                            <h5 class="card-title">Cardiologist Test #{{examination.id}}</h5>
                             <div class="d-flex  justify-content-end align-items-center">
                                 <a class="btn btn-outline-info" href="{% url 'edit_record'  record.id 'PatientCardiologist' examination.id %}">Open</a>
                                 {% if status == 'doctor'%}
@@ -114,10 +114,10 @@
                     </div>
                 </div>
                 {% elif examination.get_model_type == 'PatientBlood' %}
-                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                    <div class="card mt-2" id="examination_{{examination.id}}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Blood test #{{examination.shortened_id}}</h5>
+                                <h5 class="card-title">Blood test #{{examination.id}}</h5>
                                 <div class="d-flex  justify-content-end align-items-center">
                                     <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientBlood' examination.id %}">Open</a>
                                     {% if status == 'doctor'%}
@@ -134,10 +134,10 @@
                         </div>
                     </div>
                 {% elif examination.get_model_type == 'PatientThyroid' %}
-                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                    <div class="card mt-2" id="examination_{{examination.id}}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Thyroid test #{{examination.shortened_id}}</h5>
+                                <h5 class="card-title">Thyroid test #{{examination.id}}</h5>
                                 <div class="d-flex  justify-content-end align-items-center">
                                     <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientThyroid' examination.id %}">Open</a>
                                     {% if status == 'doctor'%}
@@ -154,10 +154,10 @@
                         </div>
                     </div>
                 {% elif examination.get_model_type == 'PatientDermatology' %}
-                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                    <div class="card mt-2" id="examination_{{examination.id}}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Dermatology test #{{examination.shortened_id}}</h5>
+                                <h5 class="card-title">Dermatology test #{{examination.id}}</h5>
                                 <div class="d-flex  justify-content-end align-items-center">
                                     <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientDermatology' examination.id %}">Open</a>
                                     {% if status == 'doctor'%}
@@ -174,10 +174,10 @@
                          </div>
                     </div>
                 {% elif examination.get_model_type == 'PatientBodyFat' %}
-                    <div class="card mt-2" id="examination_{{examination.shortened_id}}">
+                    <div class="card mt-2" id="examination_{{examination.id}}">
                         <div class="card-body">
                             <div>
-                                <h5 class="card-title">Body measures test #{{examination.shortened_id}}</h5>
+                                <h5 class="card-title">Body measures test #{{examination.id}}</h5>
                                 <div class="d-flex  justify-content-end align-items-center">
                                     <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientBodyFat' examination.id %}">Open</a>
                                     {% if status == 'doctor'%}
@@ -208,10 +208,10 @@
                 <a href="{% url 'add_record' record.pk 'PatientDiagnosis' %}" class="btn btn-outline-secondary">Add diagnosis</a>
             {% endif %}
             {% for diagnosis in patient_diagnoses %}
-                <div class="card mt-2" id="diagnosis_{{diagnosis.shortened_id}}">
+                <div class="card mt-2" id="diagnosis_{{diagnosis.id}}">
                     <div class="card-body">
                         <div>
-                            <h5 class="card-title">Diagnosis #{{diagnosis.shortened_id}}</h5>
+                            <h5 class="card-title">Diagnosis #{{diagnosis.id}}</h5>
                             <div class="d-flex  justify-content-end align-items-center">
                                 <a class="btn btn-outline-info" href="{% url 'edit_record' record.id 'PatientDiagnosis' diagnosis.id %}">Open</a>
                                 {% if status == 'doctor'%}
@@ -255,7 +255,7 @@
                  <div class="card mt-2">
                     <div class="card-body">
                         <div>
-                            <h5 class="card-title">Treatment #{{treatment.shortened_id}}</h5>
+                            <h5 class="card-title">Treatment #{{treatment.id}}</h5>
                             <div class="d-flex  justify-content-end align-items-center">
                                 <a class="btn btn-outline-info" href="{% url 'edit_record' record.pk 'PatientTreatment' treatment.id %}">Open</a>
                                 {% if status == 'doctor'%}
