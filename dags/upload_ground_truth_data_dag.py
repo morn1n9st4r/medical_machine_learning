@@ -90,6 +90,55 @@ with DAG(
         replace=True,
     )
 
+
+    save_historical_data_of_derm_task = S3CopyObjectOperator(
+        task_id = 'save_historical_data_of_derm',
+        source_bucket_key='model/dermDF.csv',
+        dest_bucket_key=f'dermDF_{str(datetime.now())}.csv',
+        source_bucket_name='medicalmlbucket',
+        dest_bucket_name='medicalmlbucket',
+        aws_conn_id='AWS_CONN',
+    )
+
+    # move from sql to s3
+    move_derm_data_from_sql_to_s3_task = SqlToS3Operator(
+        task_id='move_derm_data_from_sql_to_s3',
+        query="query_all_derm_tests_that_are_in_diagnoses.sql",
+        sql_conn_id='aws_rds',
+        aws_conn_id='AWS_CONN',
+        s3_bucket='medicalmlbucket',
+        s3_key='model/dermDF.csv',
+        replace=True,
+    )
+
+
+    save_historical_data_of_blood_task = S3CopyObjectOperator(
+        task_id = 'save_historical_data_of_blood',
+        source_bucket_key='model/bloodDF.csv',
+        dest_bucket_key=f'bloodDF_{str(datetime.now())}.csv',
+        source_bucket_name='medicalmlbucket',
+        dest_bucket_name='medicalmlbucket',
+        aws_conn_id='AWS_CONN',
+    )
+
+    # move from sql to s3
+    move_blood_data_from_sql_to_s3_task = SqlToS3Operator(
+        task_id='move_blood_data_from_sql_to_s3',
+        query="query_all_blood_tests_that_are_in_diagnoses.sql",
+        sql_conn_id='aws_rds',
+        aws_conn_id='AWS_CONN',
+        s3_bucket='medicalmlbucket',
+        s3_key='model/bloodDF.csv',
+        replace=True,
+    )
+
+
+
+
+
+
+
+
     #task thyroid
     download_from_s3_task = PythonOperator(
         task_id = 'download_thyroid_data',
