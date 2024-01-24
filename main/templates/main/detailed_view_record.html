@@ -227,9 +227,9 @@
                             <p><strong>Severity:</strong> {{diagnosis.severity|tag_definition}}</p>
                             <p><strong>Tag:</strong> {{diagnosis.tags|tag_definition}}</p>
                             <p><strong>Details:</strong> {{diagnosis.details}}</p>
-                            <p><strong>Examinations:</strong></p>
+                            <p><strong>Relevant examinations:</strong></p>
                             {% for uuid in diagnosis.examinations|split_examinations %}
-                                <a href="#examination_{{uuid}}" class="examination-link" data-uuid="{{uuid}}">{{ uuid }}</a>
+                                <a href="#examination_{{uuid}}" class="examination-link" data-uuid="{{uuid}}">{{ uuid }}</a> |
                             {% endfor %}
                         </div>
                         <div class="row">
