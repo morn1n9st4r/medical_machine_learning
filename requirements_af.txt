@@ -9,3 +9,4 @@ psycopg2-binary
 keras
 tensorflow
 airflow-provider-great-expectations
+apache-airflow[amazon]

@@ -6,6 +6,11 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 from airflow.hooks.S3_hook import S3Hook
 
+from airflow.providers.amazon.aws.transfers.sql_to_s3 import SqlToS3Operator
+from airflow.providers.amazon.aws.operators.s3 import S3CopyObjectOperator
+
+from great_expectations_provider.operators.great_expectations import GreatExpectationsOperator
+
 import psycopg2
 from psycopg2.extras import execute_values
 
@@ -64,6 +69,26 @@ with DAG(
     schedule_interval="@once",
     catchup=False
 ) as dag:
+    
+    save_historical_data_of_thyroid_task = S3CopyObjectOperator(
+        task_id = 'save_historical_data_of_thyroid',
+        source_bucket_key='model/thyroidDF.csv',
+        dest_bucket_key=f'thyroidDF_{str(datetime.now())}.csv',
+        source_bucket_name='medicalmlbucket',
+        dest_bucket_name='medicalmlbucket',
+        aws_conn_id='AWS_CONN',
+    )
+
+    # move from sql to s3
+    move_thyroid_data_from_sql_to_s3_task = SqlToS3Operator(
+        task_id='move_thyroid_data_from_sql_to_s3',
+        query="query_all_thyroid_tests_that_are_in_diagnoses.sql",
+        sql_conn_id='aws_rds',
+        aws_conn_id='AWS_CONN',
+        s3_bucket='medicalmlbucket',
+        s3_key='model/thyroidDF.csv',
+        replace=True,
+    )
 
     #task thyroid
     download_from_s3_task = PythonOperator(
@@ -214,13 +239,52 @@ with DAG(
         sql = 'transform_heart.sql',
         dag=dag,
     )
+    
+    ge_validate_train_blooddf = GreatExpectationsOperator(
+        task_id='validate_bloodDF_table',
+        data_context_root_dir="/opt/airflow/gx/",
+        checkpoint_name = "train_blooddf_checkpoint",
+        return_json_dict=True,
+        fail_task_on_validation_failure=True
+    )
 
+    ge_validate_train_bodyfatdf = GreatExpectationsOperator(
+        task_id='validate_bodyfatDF_table',
+        data_context_root_dir="/opt/airflow/gx/",
+        checkpoint_name = "train_bodyfatdf_checkpoint",
+        return_json_dict=True,
+        fail_task_on_validation_failure=True
+    )
 
+    ge_validate_train_dermdf = GreatExpectationsOperator(
+        task_id='validate_dermdf_table',
+        data_context_root_dir="/opt/airflow/gx/",
+        checkpoint_name = "train_dermdf_checkpoint",
+        return_json_dict=True,
+        fail_task_on_validation_failure=True
+    )
 
+    ge_validate_train_heartdf = GreatExpectationsOperator(
+        task_id='validate_heartdf_table',
+        data_context_root_dir="/opt/airflow/gx/",
+        checkpoint_name = "train_heartdf_checkpoint",
+        return_json_dict=True,
+        fail_task_on_validation_failure=True
+    )
 
-    download_from_s3_task >> create_thyroid_table_task >> upload_task >> transform_thyroid_task #>> validateGX
-    download_from_s3_bodyfat_task >> create_bodyfat_table_task >> upload_bodyfat_task >> transform_bodyfat_task #>> validateGX
-    download_from_s3_blood_task >> create_blood_table_task >> upload_blood_task >> transform_blood_task #>> validateGX
-    download_from_s3_derm_task >> create_derm_table_task >> upload_derm_task >> transform_derm_task #>> validateGX
-    download_from_s3_heart_task >> create_heart_table_task >> upload_heart_task >> transform_heart_task #>> validateGX
+    ge_validate_train_thyroiddf = GreatExpectationsOperator(
+        task_id='validate_thyroiddf_table',
+        data_context_root_dir="/opt/airflow/gx/",
+        checkpoint_name = "train_thyroiddf_checkpoint",
+        return_json_dict=True,
+        fail_task_on_validation_failure=True
+    )
+
+    save_historical_data_of_thyroid_task >> move_thyroid_data_from_sql_to_s3_task >> download_from_s3_task
+
+    download_from_s3_task >> create_thyroid_table_task >> upload_task >> transform_thyroid_task >> ge_validate_train_thyroiddf
+    download_from_s3_bodyfat_task >> create_bodyfat_table_task >> upload_bodyfat_task >> transform_bodyfat_task >> ge_validate_train_bodyfatdf
+    download_from_s3_blood_task >> create_blood_table_task >> upload_blood_task >> transform_blood_task >> ge_validate_train_blooddf
+    download_from_s3_derm_task >> create_derm_table_task >> upload_derm_task >> transform_derm_task >> ge_validate_train_dermdf
+    download_from_s3_heart_task >> create_heart_table_task >> upload_heart_task >> transform_heart_task >> ge_validate_train_heartdf
 
