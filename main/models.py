@@ -240,6 +240,27 @@ class ModelPrediction(models.Model):
 
 
 
+
+class MedicalDrug(models.Model):
+    drug_id = models.AutoField(primary_key=True)
+    drug_name = models.CharField(max_length=255)
+    drug_generic_name = models.CharField(max_length=255, blank=True, null=True)
+    drug_category = models.CharField(max_length=50, blank=True, null=True)
+    manufacturer = models.CharField(max_length=100, blank=True, null=True)
+    dosage_form = models.CharField(max_length=50, blank=True, null=True)
+    strength = models.CharField(max_length=20, blank=True, null=True)
+    dosage_instructions = models.TextField(blank=True, null=True)
+    side_effects = models.TextField(blank=True, null=True)
+    contraindications = models.TextField(blank=True, null=True)
+    storage_conditions = models.TextField(blank=True, null=True)
+    date_approved = models.DateField(blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    prescription_required = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.drug_name
+
+
 auditlog.register(PatientBaseRecord, serialize_data=True)
 auditlog.register(DoctorBaseRecord, serialize_data=True)
 auditlog.register(PatientAnalysisCardiologist, serialize_data=True)
