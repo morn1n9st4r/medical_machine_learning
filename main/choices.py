@@ -64,7 +64,8 @@ TAGS_CHOICES = [
     ('TD', 'Traumatic Injury'),
     ('ND', 'Nutritional Disorder'),
     ('SD', 'Skin Disorder'),
-    ('UD', 'Urological Disorder')
+    ('UD', 'Urological Disorder'),
+    ('HD', 'Hepatological disorder ')
 ]
 
 FORM_CHOICES = [
