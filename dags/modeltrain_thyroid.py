@@ -2,12 +2,10 @@ from datetime import datetime, timedelta
 import os
 import pickle
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 
-from airflow.providers.amazon.aws.operators.s3 import S3CreateObjectOperator
 from airflow.providers.amazon.aws.transfers.local_to_s3 import LocalFilesystemToS3Operator
 import psycopg2
 
@@ -15,7 +13,6 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import balanced_accuracy_score, accuracy_score, precision_score, recall_score, f1_score
-from sklearn.utils.class_weight import compute_sample_weight
 
 
 import numpy as np
@@ -38,7 +35,7 @@ def train_model(**kwargs):
         dbname='medicalmldb',
         user='medicalmladmin',
         password='Qwerty12345',
-        host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
         port='5432'
     )
 
@@ -146,7 +143,7 @@ def upload_params(**kwargs):
             dbname='medicalmldb',
             user='medicalmladmin',
             password='Qwerty12345',
-            host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+            host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
             port='5432'
         )
         cur = conn.cursor()
@@ -186,7 +183,7 @@ def upload_files_to_s3():
 with DAG(
     'train_thyroid_model',
     start_date=datetime(2023, 3, 21),
-    schedule_interval="@daily",
+    schedule_interval="@weekly",
     catchup=False
 ) as dag:
 

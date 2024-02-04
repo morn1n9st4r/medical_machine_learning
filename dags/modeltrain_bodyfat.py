@@ -2,23 +2,18 @@ from datetime import datetime, timedelta
 import os
 import pickle
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 
-from airflow.providers.amazon.aws.operators.s3 import S3CreateObjectOperator
 from airflow.providers.amazon.aws.transfers.local_to_s3 import LocalFilesystemToS3Operator
 import psycopg2
 from sklearn.ensemble import RandomForestRegressor
 
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import confusion_matrix, classification_report, mean_absolute_error, mean_squared_error
-from sklearn.metrics import balanced_accuracy_score, accuracy_score, precision_score, recall_score, f1_score
-from sklearn.utils.class_weight import compute_sample_weight
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
-import numpy as np
 import pandas as pd 
 
 
@@ -36,7 +31,7 @@ def train_model(**kwargs):
         dbname='medicalmldb',
         user='medicalmladmin',
         password='Qwerty12345',
-        host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
         port='5432'
     )
 
@@ -59,7 +54,6 @@ def train_model(**kwargs):
 
     model = RandomForestRegressor()
 
-    # Define the parameter grid for GridSearchCV
     param_grid = {
         'n_estimators': [100, 200, 300],
         'max_depth': [6, 8, 10],
@@ -67,17 +61,12 @@ def train_model(**kwargs):
         'random_state': [0]
     }
 
-    # Perform GridSearchCV
     grid_search = GridSearchCV(estimator=model, param_grid=param_grid, scoring='neg_mean_squared_error', cv=5, verbose=2)
     grid_search.fit(x_train_scaled, y_train)
-
-    # Print the best hyperparameters
+    
     print("Best Hyperparameters:", grid_search.best_params_)
 
-    # Get the best model from GridSearchCV
     best_model = grid_search.best_estimator_
-
-    # Fit the best model on the entire training set
     best_model.fit(x_train_scaled, y_train)
 
     y_pred = best_model.predict(x_test_scaled)
@@ -86,7 +75,7 @@ def train_model(**kwargs):
 
     y_test.to_csv("y_test", index=False)
 
-    with open('scaler.pkl', 'wb') as file:
+    with open('bodyfat_scaler.pkl', 'wb') as file:
         pickle.dump(scaler, file)
 
     with open('rfr.pkl', 'wb') as file:
@@ -121,7 +110,7 @@ def upload_params(**kwargs):
             dbname='medicalmldb',
             user='medicalmladmin',
             password='Qwerty12345',
-            host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+            host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
             port='5432'
         )
         cur = conn.cursor()
@@ -140,11 +129,8 @@ def upload_params(**kwargs):
 
 
 def upload_files_to_s3():
-    # Directory containing the files with the specified pattern
     directory_path = '/opt/airflow/'
-    # Find files matching the pattern
     matching_files = [file for file in os.listdir(directory_path) if file.startswith('bodyfat_')]
-    # Upload matching files to S3
     for file in matching_files:
         upload_task = LocalFilesystemToS3Operator(
             task_id=f'upload_{file}',
@@ -161,7 +147,7 @@ def upload_files_to_s3():
 with DAG(
     'train_bodyfat_model',
     start_date=datetime(2023, 3, 21),
-    schedule_interval="@daily",
+    schedule_interval="@weekly",
     catchup=False
 ) as dag:
 

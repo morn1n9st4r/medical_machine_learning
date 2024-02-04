@@ -2,12 +2,10 @@ from datetime import datetime, timedelta
 import os
 import pickle
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 
 
-from airflow.providers.amazon.aws.operators.s3 import S3CreateObjectOperator
 from airflow.providers.amazon.aws.transfers.local_to_s3 import LocalFilesystemToS3Operator
 import psycopg2
 
@@ -15,10 +13,8 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import balanced_accuracy_score, accuracy_score, precision_score, recall_score, f1_score
-from sklearn.utils.class_weight import compute_sample_weight
 
 
-import numpy as np
 import pandas as pd 
 
 
@@ -32,20 +28,22 @@ default_args = {
 def train_model(**kwargs):
     print("Training model")
 
-    #bloodDF = pd.read_csv("bloodDF")
-
     conn = psycopg2.connect(
         dbname='medicalmldb',
         user='medicalmladmin',
         password='Qwerty12345',
-        host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
         port='5432'
     )
 
     bloodDF = pd.read_sql_query('select * from bloodDF',con=conn)
+
+    # apparently SQL 'ALTER COLUMN sex TYPE int using sex::int;' doesn't work
+    # finish transformations directly before model training  
     bloodDF['sex'] = pd.to_numeric(bloodDF['sex'])
     bloodDF['target'] = pd.to_numeric(bloodDF['target'])
-    # train and test split --> stratified
+
+
     X = bloodDF.drop('target', axis=1).copy()
     y = bloodDF['target'].copy()
 
@@ -133,7 +131,7 @@ def upload_params(**kwargs):
             dbname='medicalmldb',
             user='medicalmladmin',
             password='Qwerty12345',
-            host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+            host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
             port='5432'
         )
         cur = conn.cursor()
@@ -152,11 +150,8 @@ def upload_params(**kwargs):
 
 
 def upload_files_to_s3():
-    # Directory containing the files with the specified pattern
     directory_path = '/opt/airflow/'
-    # Find files matching the pattern
     matching_files = [file for file in os.listdir(directory_path) if file.startswith('blood_')]
-    # Upload matching files to S3
     for file in matching_files:
         upload_task = LocalFilesystemToS3Operator(
             task_id=f'upload_{file}',
@@ -173,7 +168,7 @@ def upload_files_to_s3():
 with DAG(
     'train_blood_model',
     start_date=datetime(2023, 3, 21),
-    schedule_interval="@daily",
+    schedule_interval="@weekly",
     catchup=False
 ) as dag:
 

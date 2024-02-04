@@ -38,7 +38,7 @@ def train_model(**kwargs):
         dbname='medicalmldb',
         user='medicalmladmin',
         password='Qwerty12345',
-        host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
         port='5432'
     )
 
@@ -186,7 +186,7 @@ def upload_params(**kwargs):
             dbname='medicalmldb',
             user='medicalmladmin',
             password='Qwerty12345',
-            host='rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+            host='rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
             port='5432'
         )
         cur = conn.cursor()

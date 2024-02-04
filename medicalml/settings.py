@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-+a3r3!*gbuppum^r9*26a@4!56@w0@nux42&x#c&718mz5dm)(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -91,7 +91,7 @@ DATABASES = {
         'NAME': 'medicalmldb',
         'USER': 'medicalmladmin',
         'PASSWORD': 'Qwerty12345',
-        'HOST': 'rdsterraform.cdwy46wiszkf.eu-north-1.rds.amazonaws.com',
+        'HOST': 'rdsterraform.cvyu8kkk0p75.eu-west-3.rds.amazonaws.com',
         'PORT': '5432'
     }
 }
@@ -131,12 +131,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'main/static'),
-    # Add other paths as needed
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'main/static')
+STATIC_URL = 'main/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
