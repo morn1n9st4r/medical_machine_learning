@@ -1,4 +1,4 @@
-CREATE TABLE dermDF (
+CREATE TABLE IF NOT EXISTS dermDF (
     erythema INT,
     scaling INT,
     definite_borders INT,

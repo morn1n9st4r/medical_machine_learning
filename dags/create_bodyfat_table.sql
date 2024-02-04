@@ -1,4 +1,4 @@
-CREATE TABLE bodyfatDF (
+CREATE TABLE IF NOT EXISTS bodyfatDF (
     BodyFat FLOAT,
     Original VARCHAR(1),
     Sex VARCHAR(7),

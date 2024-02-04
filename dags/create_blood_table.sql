@@ -1,4 +1,4 @@
-CREATE TABLE bloodDF (
+CREATE TABLE IF NOT EXISTS bloodDF (
     id VARCHAR(255),
     target VARCHAR(255),
     Age INTEGER,

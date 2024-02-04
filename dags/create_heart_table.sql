@@ -1,5 +1,4 @@
-
-CREATE TABLE heartDF_temp (
+CREATE TABLE IF NOT EXISTS heartDF_temp (
     idx INT,
     Age INT,
     Sex INT,
@@ -17,7 +16,7 @@ CREATE TABLE heartDF_temp (
     Heart_Disease VARCHAR(10)
 );
 
-CREATE TABLE heartDF (
+CREATE TABLE IF NOT EXISTS heartDF (
     Age INT,
     Sex INT,
     Chest_pain_type INT,
