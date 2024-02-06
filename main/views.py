@@ -1,34 +1,51 @@
+# Standard library imports
 import os
 import pickle
-from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse
-import numpy as np
-
-from main.templatetags.medicalml_extras import tag_definition
-from .forms import BodyFatTestForm, DermatologyTestForm, RecordForm, RegisterForm, ThyroidTestForm
-from django.contrib.auth import login, logout, authenticate
-
-from .forms import CardiologistForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
-from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment, ModelPrediction
-from django.contrib.auth.models import User
-from .models import PatientBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientDiagnosis, PatientTreatment, MedicalRecordRegistry
-
-
-from django.views.generic.edit import UpdateView
-
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-
+import datetime
 from itertools import chain
 from operator import attrgetter
 
-import datetime
+# Third-party imports
+import numpy as np
 import pandas as pd
 
+# Django imports
+from django.http import HttpResponseForbidden, HttpResponseNotFound
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.db import models
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
+# Local application imports
+from .forms import (
+    BodyFatTestForm, 
+    DermatologyTestForm, 
+    RecordForm, 
+    RegisterForm, 
+    ThyroidTestForm,
+    CardiologistForm, 
+    BloodTestForm, 
+    DiagnosisForm, 
+    TreatmentForm, 
+    ExaminationsForm
+)
+from .models import (
+    PatientBaseRecord, 
+    DoctorBaseRecord, 
+    PatientAnalysisCardiologist, 
+    PatientBloodTest, 
+    PatientBodyFatTest, 
+    PatientDermatologyTest, 
+    PatientDiagnosis, 
+    PatientThyroidTest, 
+    ModelPrediction, 
+    PatientTreatment, 
+    MedicalRecordRegistry
+)
 
 def check_user_page(req, record_id):
     patients = PatientBaseRecord.objects.filter(patient=req.user).first()
