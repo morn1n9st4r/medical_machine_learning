@@ -12,6 +12,8 @@ from django.contrib.auth import login, logout, authenticate
 from .forms import CardiologistForm, BloodTestForm, DiagnosisForm, TreatmentForm, ExaminationsForm
 from .models import PatientBaseRecord, DoctorBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment, ModelPrediction
 from django.contrib.auth.models import User
+from .models import PatientBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientDiagnosis, PatientTreatment, MedicalRecordRegistry
+
 
 from django.views.generic.edit import UpdateView
 
@@ -39,14 +41,12 @@ def check_user_page(req, record_id):
         return 'doctor'
 
 
-
 def check_user_login(req):
     patients = PatientBaseRecord.objects.filter(patient=req.user).first()
     if patients:
         return 'patient'
     else:
         return 'doctor'
-
 
 
 @login_required(login_url='/login')
@@ -126,7 +126,6 @@ def get_form_class(test_type):
     
     return form_classes.get(test_type, CardiologistForm) 
 
-from .models import PatientBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientDiagnosis, PatientTreatment
 
 def get_model_class(model_name):
     form_classes = {
@@ -141,7 +140,6 @@ def get_model_class(model_name):
     }
     
     return form_classes.get(model_name, PatientBaseRecord) 
-
 
 
 def sign_up(request):
@@ -189,7 +187,6 @@ def sign_up(request):
         form = RegisterForm()
 
     return render(request, 'registration/sign_up.html', {'form': form})
-
 
 
 def terms_and_conditions(request):
@@ -247,9 +244,6 @@ def detailed_view_record(request, record_id, active_tab='examination'):
         return HttpResponseForbidden(render(request, 'main/403.html'))  
 
 
-
-
-
 @login_required(login_url='/login')
 @require_http_methods(["GET", "POST"])
 def edit_profile(request, record_id):
@@ -284,6 +278,7 @@ def edit_profile(request, record_id):
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
     
+
 @login_required(login_url='/login')
 def edit_record(request, record_id, exam_type, id):
     
@@ -301,7 +296,6 @@ def edit_record(request, record_id, exam_type, id):
     else:
         form = form_class(instance=record)
     return render(request, "main/edit_record.html", {"form": form, "record": record, "status": status})
-
 
 
 @login_required(login_url='/login')
@@ -340,7 +334,14 @@ def add_record(request, record_id, test_type):
         if request.method == 'POST':
             form = form_class(request.POST)
             if form.is_valid():
+                new_id_in_registry = MedicalRecordRegistry()
+                new_id_in_registry.save()
+
+                latest_record = MedicalRecordRegistry.objects.order_by('-id').first()
+
                 medical_record = form.save(commit=False)
+
+                medical_record.id = latest_record.id
                 medical_record.patient = patient_record
                 medical_record.doctor = current_user
                 medical_record.date = datetime.datetime.now()
@@ -373,9 +374,6 @@ def add_record(request, record_id, test_type):
                                                             })
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))    
-
-
-
 
 
 @login_required(login_url='/login')
@@ -498,9 +496,6 @@ def update_examinations(request, record_id, diagnosis_id):
                                                             })
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))  
-
-
-
 
 
 @login_required(login_url='/login')
@@ -666,7 +661,6 @@ def predict_cardio_view(request, record_id):
         return HttpResponseForbidden(render(request, 'main/403.html'))      
 
 
-
 @login_required(login_url='/login')
 def predict_thyroid_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
@@ -731,7 +725,6 @@ def predict_thyroid_view(request, record_id):
         return HttpResponseForbidden(render(request, 'main/403.html'))      
 
 
-
 @login_required(login_url='/login')
 def predict_body_fat_view(request, record_id):
     if check_user_page(request, record_id)  == 'doctor':
@@ -793,7 +786,6 @@ def predict_body_fat_view(request, record_id):
                 return HttpResponseNotFound(render(request, 'main/error.html', {'error_message': 'Data absent or in wrong format.'}))   
     else:
         return HttpResponseForbidden(render(request, 'main/403.html'))      
-
 
 
 @login_required(login_url='/login')

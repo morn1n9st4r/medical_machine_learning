@@ -46,8 +46,12 @@ class DoctorBaseRecord(models.Model):
         return f"ID: {self.id} - Dr. {self.first_name} {self.last_name}, DoB: {self.date_of_birth}"
 
 
+class MedicalRecordRegistry(models.Model):
+    id = models.AutoField(primary_key=True)
+
+
 class MedicalRecordsABC(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True)
+    id = models.IntegerField(primary_key=True, unique=True)
     patient = models.ForeignKey(PatientBaseRecord, on_delete=models.CASCADE)
     date = models.DateTimeField()
     
