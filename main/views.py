@@ -48,6 +48,19 @@ from .models import (
     MedicalRecordRegistry
 )
 
+
+from dal import autocomplete
+
+class MedicineAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = MedicalDrug.objects.all()
+
+        if self.q:
+            qs = qs.filter(drug_name__icontains=self.q)
+
+        return qs
+
+
 def check_user_page(req, record_id):
     patients = PatientBaseRecord.objects.filter(patient=req.user).first()
     if patients:

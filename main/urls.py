@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('medicine-autocomplete/', views.MedicineAutocomplete.as_view(), name='medicine-autocomplete'),
     path('custom_login_redirect/', views.custom_login_redirect, name='custom_login_redirect'),
     path('home', views.home, name='home'),
     path('sign-up', views.sign_up, name='sign_up'),

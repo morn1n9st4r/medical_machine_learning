@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django_forms_bootstrap',
     'crispy_forms',
     'crispy_bootstrap5',
+    'dal',
+    'dal_select2',
     'auditlog'
 ]
 

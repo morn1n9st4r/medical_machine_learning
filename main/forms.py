@@ -67,6 +67,11 @@ class DiagnosisForm(forms.ModelForm):
         exclude = ['id', 'patient', 'doctor', 'date', 'examinations']
 
 class TreatmentForm(forms.ModelForm):
+    medicine = forms.ModelChoiceField(
+        queryset=MedicalDrug.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = PatientTreatment
         fields = "__all__"

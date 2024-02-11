@@ -47,5 +47,13 @@
 </script>
 
 
+<script>
+    $(document).ready(function () {
+        $('#id_medicine').autocomplete({
+            source: `{% url 'medicine-autocomplete' %}`,
+            minLength: 2,  // Minimum length of the query before triggering autocomplete
+        });
+    });
+</script>
 
 {% endblock %}
