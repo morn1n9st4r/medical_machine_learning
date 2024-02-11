@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import PatientBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment
+from .models import MedicalDrug, PatientBaseRecord, PatientAnalysisCardiologist, PatientBloodTest, PatientBodyFatTest, PatientDermatologyTest, PatientDiagnosis, PatientThyroidTest, PatientTreatment
 import uuid
 from bootstrap_datepicker_plus.widgets import DatePickerInput
 
@@ -48,8 +48,6 @@ class ThyroidTestForm(forms.ModelForm):
         fields = "__all__"
         exclude = ['id', 'patient', 'doctor', 'date']
 
-
-
 class DermatologyTestForm(forms.ModelForm):
     class Meta:
         model = PatientDermatologyTest
@@ -61,7 +59,6 @@ class BodyFatTestForm(forms.ModelForm):
         model = PatientBodyFatTest
         fields = "__all__"
         exclude = ['id', 'patient', 'doctor', 'date']
-
 
 class DiagnosisForm(forms.ModelForm):
     class Meta:

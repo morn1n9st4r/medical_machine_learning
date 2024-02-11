@@ -34,6 +34,7 @@ from .forms import (
     ExaminationsForm
 )
 from .models import (
+    MedicalDrug,
     PatientBaseRecord, 
     DoctorBaseRecord, 
     PatientAnalysisCardiologist, 
@@ -362,7 +363,6 @@ def add_record(request, record_id, test_type):
                 medical_record.patient = patient_record
                 medical_record.doctor = current_user
                 medical_record.date = datetime.datetime.now()
-
                 medical_record.save()
                 return redirect('detailed_view_record', record_id=patient_record.id)
         else:
