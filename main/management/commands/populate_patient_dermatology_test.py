@@ -20,7 +20,7 @@ class Command(BaseCommand):
             record = PatientDermatologyTest(
                 id=latest_record.id,
                 patient=patient,
-                date=datetime.now() - timedelta(days=random.randint(0, 365)),
+                date=datetime.now() - timedelta(days=random.randint(0, 365*3)),
                 family_history=random.choice([True, False]),
                 erythema=random.choice(DERMATOLOGY_CHOICES),
                 scaling=random.choice(DERMATOLOGY_CHOICES),
