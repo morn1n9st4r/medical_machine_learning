@@ -23,7 +23,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 # Local application imports
 from .forms import (
     BodyFatTestForm, 
-    DermatologyTestForm, 
+    DermatologyTestForm,
+    MedicalDrugForm, 
     RecordForm, 
     RegisterForm, 
     ThyroidTestForm,
@@ -153,6 +154,7 @@ def get_form_class(test_type):
 
         'PatientDiagnosis': DiagnosisForm,
         'PatientTreatment': TreatmentForm,
+        'MedicalDrug': MedicalDrugForm,
     }
     
     return form_classes.get(test_type, CardiologistForm) 
@@ -167,7 +169,8 @@ def get_model_class(model_name):
         'PatientBaseRecord': PatientBaseRecord,
         'PatientThyroid': PatientThyroidTest,
         'PatientDermatology': PatientDermatologyTest,
-        'PatientBodyFat': PatientBodyFatTest
+        'PatientBodyFat': PatientBodyFatTest,
+        'MedicalDrug': MedicalDrug,
     }
     
     return form_classes.get(model_name, PatientBaseRecord) 
@@ -262,12 +265,14 @@ def detailed_view_record(request, record_id, active_tab='examination'):
 
         model_predictions = sorted(ModelPrediction.objects.filter(patient=patient_record.pk), key=attrgetter('time'), reverse=True)
 
+        medical_drugs = MedicalDrug.objects.all()
         return render(request, 'main/detailed_view_record.html', {
             'record': patient_record,
             'medical_examinations': medical_examinations,
             'patient_diagnoses': patient_diagnoses,
             'patient_treatments': patient_treatments,
             'model_predictions': model_predictions,
+            'medical_drugs': medical_drugs,
             'status': status,
             'active_tab': active_tab
             })

@@ -81,3 +81,9 @@ class ExaminationsForm(forms.ModelForm):
     class Meta:
         model = PatientDiagnosis
         fields = ['examinations']
+
+class MedicalDrugForm(forms.ModelForm):
+    class Meta:
+        model = MedicalDrug
+        fields = "__all__"
+        exclude = ['id']
