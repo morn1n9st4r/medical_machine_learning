@@ -144,6 +144,21 @@ def home(request):
         return HttpResponseForbidden(render(request, 'main/403.html'))   
 
 
+def medicaments(request):
+    status = check_user_login(request)
+
+    # since we reuse view for adding new records, it is necessary to pass some patient id
+    # even if it is not used in any way
+    # TODO:
+    # write new view that specifically handles medicaments 
+    stub_id  = PatientBaseRecord.objects.order_by('?').first().id
+
+    medical_drugs = MedicalDrug.objects.all()
+    return render(request, 'main/medicaments.html', {'medical_drugs': medical_drugs,
+                                                     'status': status,
+                                                     'stub_id': stub_id})
+
+
 def get_form_class(test_type):
     form_classes = {
         'PatientCardiologist': CardiologistForm,
@@ -265,14 +280,12 @@ def detailed_view_record(request, record_id, active_tab='examination'):
 
         model_predictions = sorted(ModelPrediction.objects.filter(patient=patient_record.pk), key=attrgetter('time'), reverse=True)
 
-        medical_drugs = MedicalDrug.objects.all()
         return render(request, 'main/detailed_view_record.html', {
             'record': patient_record,
             'medical_examinations': medical_examinations,
             'patient_diagnoses': patient_diagnoses,
             'patient_treatments': patient_treatments,
             'model_predictions': model_predictions,
-            'medical_drugs': medical_drugs,
             'status': status,
             'active_tab': active_tab
             })

@@ -7,6 +7,7 @@ urlpatterns = [
     path('medicine-autocomplete/', views.MedicineAutocomplete.as_view(), name='medicine-autocomplete'),
     path('custom_login_redirect/', views.custom_login_redirect, name='custom_login_redirect'),
     path('home', views.home, name='home'),
+    path('medicaments', views.medicaments, name='medicaments'),
     path('sign-up', views.sign_up, name='sign_up'),
     path('terms_and_conditions/', views.terms_and_conditions, name='terms_and_conditions'),
     path('record/<int:record_id>/', views.detailed_view_record, name='detailed_view_record'),

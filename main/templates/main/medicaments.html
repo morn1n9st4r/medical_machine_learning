@@ -1,0 +1,43 @@
+{% extends 'main/base.html' %}
+{% block title %}List of Patients{% endblock %}
+{% block content %}
+
+{% load medicalml_extras %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div>
+    {% if status == 'doctor' %}
+        <a href="{% url 'add_record' stub_id 'MedicalDrug' %}" class="btn btn-outline-secondary" >Add drug</a>
+    {% endif %}
+    {% for drug in medical_drugs %}
+    <div class="card mt-2">
+        
+        <div class="card-header">
+                    <button class="btn" style="width: 100%;" type="button" data-bs-toggle="collapse" data-bs-target="#drugInfoCollapse{{ drug.drug_id }}" aria-expanded="false" aria-controls="drugInfoCollapse{{ drug.drug_id }}">
+                        {{ drug.drug_name }}
+                    </button>
+        </div>
+        <div id="drugInfoCollapse{{ drug.drug_id }}" class="collapse" aria-labelledby="drugInfoHeader">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Generic Name:</strong> {{ drug.drug_generic_name }}</li>
+                    <li class="list-group-item"><strong>Category:</strong> {{ drug.drug_category }}</li>
+                    <li class="list-group-item"><strong>Manufacturer:</strong> {{ drug.manufacturer }}</li>
+                    <li class="list-group-item"><strong>Dosage Form:</strong> {{ drug.dosage_form }}</li>
+                    <li class="list-group-item"><strong>Strength:</strong> {{ drug.strength }}</li>
+                    <li class="list-group-item"><strong>Instructions:</strong> {{ drug.dosage_instructions }}</li>
+                    <li class="list-group-item"><strong>Side effects:</strong> {{ drug.side_effects }}</li>
+                    <li class="list-group-item"><strong>Contraindications:</strong> {{ drug.contraindications }}</li>
+                    <li class="list-group-item"><strong>Prescription Required:</strong> {{ drug.prescription_required }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <p>No records</p>
+    {% endfor %}
+</div>
+
+
+{% endblock %}
