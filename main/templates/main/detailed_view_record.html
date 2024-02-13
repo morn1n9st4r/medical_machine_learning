@@ -54,8 +54,6 @@
     </div>
 </div>
 
-
-
 <ul class="nav nav-tabs d-flex" id="myTab" role="tablist">
     <li class="nav-item  flex-grow-1"   role="presentation">
       <button class="nav-link active w-100"  id="examination-tab" data-bs-toggle="tab" data-bs-target="#examination" type="button" role="tab" aria-controls="examination" aria-selected="true">examination</button>
@@ -336,10 +334,13 @@
                     <div class="card-body">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item"><strong>Generic Name:</strong> {{ drug.drug_generic_name }}</li>
+                            <li class="list-group-item"><strong>Category:</strong> {{ drug.drug_category }}</li>
                             <li class="list-group-item"><strong>Manufacturer:</strong> {{ drug.manufacturer }}</li>
                             <li class="list-group-item"><strong>Dosage Form:</strong> {{ drug.dosage_form }}</li>
                             <li class="list-group-item"><strong>Strength:</strong> {{ drug.strength }}</li>
-                            <li class="list-group-item"><strong>Price:</strong> {{ drug.price }}</li>
+                            <li class="list-group-item"><strong>Instructions:</strong> {{ drug.dosage_instructions }}</li>
+                            <li class="list-group-item"><strong>Side effects:</strong> {{ drug.side_effects }}</li>
+                            <li class="list-group-item"><strong>Contraindications:</strong> {{ drug.contraindications }}</li>
                             <li class="list-group-item"><strong>Prescription Required:</strong> {{ drug.prescription_required }}</li>
                         </ul>
                     </div>
