@@ -18,6 +18,9 @@ MedicalML is a web-based application that leverages machine learning for medical
 - Patient and doctor record management via web interface.
 - Predictive models for various medical conditions like general cardiological disorder, psoriasis, seborrheic dermatitis, lichen planus, pityriasis rosea, chronic dermatitis, pityriasis trichosanthes, hypothyroid, hyperthyroid, hepatitis, fibrosis, cirrhosis and predicting body fat percentage based on circumference of body parts.
 
+## Data validation
+Before using data in training we must validate that preprocessing is correct and nothing left behind. Great expections is used to check whether correct types are used, no missing or incorrect (in case of finite number of variants) values and overall tables structure. This is crucial part of training pipeline and tests are done automatically inside of Airflow DAG. These checks are applied for each machine learning model that are being used and trained. 
+
 ## Installation and usage
 To install and run this project, follow these steps:
 
