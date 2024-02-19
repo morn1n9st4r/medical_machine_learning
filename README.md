@@ -22,24 +22,41 @@ MedicalML is a web-based application that leverages machine learning for medical
 Before using data in training we must validate that preprocessing is correct and nothing left behind. Great expections is used to check whether correct types are used, no missing or incorrect (in case of finite number of variants) values and overall tables structure. This is crucial part of training pipeline and tests are done automatically inside of Airflow DAG. These checks are applied for each machine learning model that are being used and trained. 
 
 ## Installation and usage
-To install and run this project, follow these steps:
 
-1. Clone the repository to your local machine.
-2. Build the airflow image with
+To install and run this project, follow these steps:
+Clone the repository to your local machine.
+
+### Cloud part
+1. Initialize Terraform with 
+```
+terraform init 
+```
+2. Enter your region, Access key and Secret access key in main.tf file
+3. Change name of S3 bucket.
+4. Plan your resources with
+```
+terraform plan 
+```
+5. Create your resources with
+```
+terraform apply 
+```
+### Local part
+1. Build the airflow image with
 ```
 docker build -f Dockerfile.airflow . -t airflow-ml 
 ```
-3. Place your AWS RDS credentials into settings.py file.
-4. Migrate database with
+2. Place your AWS RDS credentials from console page into settings.py file.
+3. Migrate database with
 ```
 python3 manage.py makemigrations
 python3 manage.py migrate
 ```
-5. Run Apache Airflow with 
+4. Run Apache Airflow with 
 ```
 docker compose up
 ```
-6. Start Django with 
+5. Start Django with 
 ```
 python3 manage.py runserver
 ```
