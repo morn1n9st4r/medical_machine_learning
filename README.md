@@ -22,7 +22,24 @@ MedicalML is a web-based application that leverages machine learning for medical
 To install and run this project, follow these steps:
 
 1. Clone the repository to your local machine.
-2. 
+2. Build the airflow image with
+```
+docker build -f Dockerfile.airflow . -t airflow-ml 
+```
+3. Place your AWS RDS credentials into settings.py file.
+4. Migrate database with
+```
+python3 manage.py makemigrations
+python3 manage.py migrate
+```
+5. Run Apache Airflow with 
+```
+docker compose up
+```
+6. Start Django with 
+```
+python3 manage.py runserver
+```
 
 ## Future work
 - Improve the accuracy of the machine learning models.
