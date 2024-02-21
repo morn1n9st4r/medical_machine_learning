@@ -20,6 +20,7 @@ DERMATOLOGY_CHOICES = [
 ]
 
 CHESTPAIN_CHOICES = [
+    ('NP', 'No Pain'),
     ('TA', 'Typical Angina'),
     ('ATA', 'Atypical Angina'),
     ('NAP', 'Non-Anginal Pain'),
