@@ -5,56 +5,13 @@ from main.models import DoctorBaseRecord, MedicalRecordRegistry, PatientBaseReco
 import random
 import numpy as np
 
+from main.utils import create_diagnosis, create_treatment
+
 
 class Command(BaseCommand):
     help = 'Populates the PatientAnalysisCardiologist model with 1 instances.'
 
     def handle(self, *args, **options):
-
-        def create_diagnosis(patient, diag, severity, details, tags, cured, examination):
-            new_id_in_registry = MedicalRecordRegistry()
-            new_id_in_registry.save()
-            latest_record = MedicalRecordRegistry.objects.order_by('-id').first()
-
-            medical_diagnosis = PatientDiagnosis(
-                id=latest_record.id,
-                doctor = DoctorBaseRecord.objects.order_by('?').first(),
-                patient=patient,
-                date=examination.date + timedelta(days=random.randint(0, 365)),
-                disease_name=diag,
-                severity=severity,
-                details=details,
-                tags=tags,
-                cured=cured,
-                examinations=str(examination.id)
-                )
-            medical_diagnosis.save()
-            return latest_record.id
-
-        def create_treatment(patient, medicine, quantity, quantity_type, frequency, diagnosis_id):
-
-            new_id_in_registry = MedicalRecordRegistry()
-            new_id_in_registry.save()
-            latest_record = MedicalRecordRegistry.objects.order_by('-id').first()
-
-            target_diag = PatientDiagnosis.objects.filter(id=diagnosis_id).first()
-
-            medical_treatment = PatientTreatment(
-                id=latest_record.id,
-                doctor = DoctorBaseRecord.objects.order_by('?').first(),
-                patient=patient,
-                date=target_diag.date  + timedelta(days=random.randint(0, 14)),
-                medicine=medicine,
-                quantity=quantity,
-                quantity_type=quantity_type,
-                frequency=frequency,
-                start_date=target_diag.date  + timedelta(days=random.randint(14, 28)),
-                finish_date=target_diag.date  + timedelta(days=random.randint(28, 140)),
-                diagnosis=diagnosis_id
-                )
-            medical_treatment.save()
-            return latest_record
-
 
         for i in range(20):
             patient = PatientBaseRecord.objects.order_by('?').first()
@@ -81,7 +38,7 @@ class Command(BaseCommand):
                 restbp=np.random.normal(restbp_mean, restbp_std),  # Resting blood pressure from normal distribution
                 maxhr=np.random.normal(maxhr_mean, maxhr_std),  # Maximum heart rate from normal distribution
                 resting_ecg=random.choice(ECG_CHOICES)[0],
-                excercise_angina=False,
+                excercise_angina=random.choice([True, False]),
                 slope_st=random.choice(SLOPE_CHOICES)[0],
                 st_depression=np.random.normal(st_depression_mean, st_depression_std),  # ST depression from normal distribution
                 fluoroscopy_vessels=random.choices(possible_values, weights)[0],  # Random number of fluoroscopy vessels (0 to 3)
