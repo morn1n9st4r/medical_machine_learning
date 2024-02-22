@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        for i in range(1):
+        for i in range(20):
             patient = PatientBaseRecord.objects.order_by('?').first()
 
             new_id_in_registry = MedicalRecordRegistry()
@@ -20,8 +20,8 @@ class Command(BaseCommand):
             latest_record = MedicalRecordRegistry.objects.order_by('-id').first()
 
             # Define mean and standard deviation for each attribute
-            height_mean, height_std = 1.75, 0.1
-            weight_mean, weight_std = 75, 15
+            height_mean, height_std = 1.7, 0.2
+            weight_mean, weight_std = 75, 35
             neck_circ_mean, neck_circ_std = 40, 5
             chest_circ_mean, chest_circ_std = 95, 15
             abdomen_circ_mean, abdomen_circ_std = 85, 10
@@ -52,36 +52,36 @@ class Command(BaseCommand):
             )
             record.save()
 
-            if record.height < 1.5 and record.weight > 100:
-                diag_id = create_diagnosis(patient, 'Obesity', 'MO', 'excessive body fat', 'HD', False, record)
+            if  record.weight/(record.height*record.height) > 25:
+                diag_id = create_diagnosis(patient, 'Obesity', 'MO', 'excessive body fat', 'VD', False, record)
                 create_treatment(patient, 'Dietary counseling', 1, 'session', 'DA', diag_id)
                 if random.random() < 0.38:
                     create_treatment(patient, 'Physical therapy', 1, 'session', 'DA', diag_id)
                     if random.random() < 0.31:
                         create_treatment(patient, 'Bariatric surgery', 1, 'procedure', 'DA', diag_id)
-            elif record.neck_circ > 50 and record.abdomen_circ > 100:
-                diag_id = create_diagnosis(patient, 'Central Obesity', 'MO', 'excessive fat around the stomach and abdomen', 'HD', False, record)
+            elif record.neck_circ > 44 and record.abdomen_circ > 93:
+                diag_id = create_diagnosis(patient, 'Central Obesity', 'MO', 'excessive fat around the stomach and abdomen', 'VD', False, record)
                 create_treatment(patient, 'Dietary counseling', 1, 'session', 'DA', diag_id)
                 if random.random() < 0.38:
                     create_treatment(patient, 'Physical therapy', 1, 'session', 'DA', diag_id)
                     if random.random() < 0.31:
                         create_treatment(patient, 'Liposuction', 1, 'procedure', 'DA', diag_id)
-            elif record.hip_circ > 135 and record.thigh_circ > 60:
-                diag_id = create_diagnosis(patient, 'Lower Body Obesity', 'MO', 'excessive fat in the hip and thigh regions', 'HD', False, record)
+            elif record.hip_circ > 118 and record.thigh_circ > 60:
+                diag_id = create_diagnosis(patient, 'Lower Body Obesity', 'MO', 'excessive fat in the hip and thigh regions', 'VD', False, record)
                 create_treatment(patient, 'Dietary counseling', 1, 'session', 'DA', diag_id)
                 if random.random() < 0.38:
                     create_treatment(patient, 'Physical therapy', 1, 'session', 'DA', diag_id)
                     if random.random() < 0.31:
                         create_treatment(patient, 'Thigh lift surgery', 1, 'procedure', 'DA', diag_id)
-            elif record.bicep_circ > 35 and record.forearm_circ > 30:
-                diag_id = create_diagnosis(patient, 'Upper Body Obesity', 'MO', 'excessive fat in the upper body, particularly in the arms', 'HD', False, record)
+            elif record.bicep_circ > 35 and record.forearm_circ > 28:
+                diag_id = create_diagnosis(patient, 'Upper Body Obesity', 'MO', 'excessive fat in the upper body, particularly in the arms', 'VD', False, record)
                 create_treatment(patient, 'Dietary counseling', 1, 'session', 'DA', diag_id)
                 if random.random() < 0.38:
                     create_treatment(patient, 'Physical therapy', 1, 'session', 'DA', diag_id)
                     if random.random() < 0.31:
                         create_treatment(patient, 'Arm lift surgery', 1, 'procedure', 'DA', diag_id)
-            elif record.wrist_circ > 20:
-                diag_id = create_diagnosis(patient, 'Wrist Obesity', 'MO', 'excessive fat around the wrist', 'HD', False, record)
+            elif record.wrist_circ > 21:
+                diag_id = create_diagnosis(patient, 'Wrist Obesity', 'MO', 'excessive fat around the wrist', 'VD', False, record)
                 create_treatment(patient, 'Dietary counseling', 1, 'session', 'DA', diag_id)
                 if random.random() < 0.38:
                     create_treatment(patient, 'Physical therapy', 1, 'session', 'DA', diag_id)

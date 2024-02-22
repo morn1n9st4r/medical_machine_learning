@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        for i in range(1):
+        for i in range(20):
             patient = PatientBaseRecord.objects.order_by('?').first()
 
             new_id_in_registry = MedicalRecordRegistry()

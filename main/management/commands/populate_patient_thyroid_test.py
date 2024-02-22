@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        for i in range(1):
+        for i in range(20):
             patient = PatientBaseRecord.objects.order_by('?').first()
 
             new_id_in_registry = MedicalRecordRegistry()
@@ -40,62 +40,56 @@ class Command(BaseCommand):
             )
             record.save()
 
-            if record.tsh > 3.1 and record.t3 < 120:
-                diag_id = create_diagnosis(patient, 'Hypothyroidism', 'MO', 'underactive thyroid gland', 'HD', False, record)
-                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Liothyronine', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Thyroid supplement', 1, 'tablet', 'DA', diag_id)
-            elif record.tsh < 1.1 and record.t3 > 170:
-                diag_id = create_diagnosis(patient, 'Hyperthyroidism', 'MO', 'overactive thyroid gland', 'HD', False, record)
-                create_treatment(patient, 'Methimazole', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Propranolol', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Radioactive iodine', 1, 'dose', 'DA', diag_id)
-            elif record.tt4 > 9.2 and record.t4u > 1.5 and record.fti < 0.92:
-                diag_id = create_diagnosis(patient, 'Thyroid Hormone Resistance', 'MO', 'resistance to thyroid hormones', 'HD', False, record)
-                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Triiodothyronine', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Beta blockers', 1, 'tablet', 'DA', diag_id)
-            elif record.goitre:
-                diag_id = create_diagnosis(patient, 'Goitre', 'MO', 'enlarged thyroid gland', 'HD', False, record)
-                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Iodine supplement', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Thyroid surgery', 1, 'procedure', 'DA', diag_id)
-            elif record.tsh > 3.1  and record.t3 < 120 and record.goitre:
-                diag_id = create_diagnosis(patient, 'Hypothyroidism with Goitre', 'MO', 'underactive thyroid gland with enlarged thyroid gland', 'HD', False, record)
-                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Potassium iodide', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Liothyronine', 1, 'tablet', 'DA', diag_id)
-            elif record.tsh < 1.1 and record.t3 > 170 and record.tt4 > 9.5:
-                diag_id = create_diagnosis(patient, 'Hyperthyroidism with High TT4', 'MO', 'overactive thyroid gland with high total T4', 'HD', False, record)
-                create_treatment(patient, 'Methimazole', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Propranolol', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Propylthiouracil', 1, 'tablet', 'DA', diag_id)
-            elif record.t4u > 1.5 and record.fti < 0.99 and record.goitre:
-                diag_id = create_diagnosis(patient, 'Thyroid Hormone Resistance with Goitre', 'MO', 'resistance to thyroid hormones with enlarged thyroid gland', 'HD', False, record)
-                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
-                if random.random() < 0.38:
-                    create_treatment(patient, 'Triiodothyronine', 1, 'tablet', 'DA', diag_id)
-                    if random.random() < 0.31:
-                        create_treatment(patient, 'Potassium iodide', 1, 'tablet', 'DA', diag_id)
-            elif record.tsh > 3.1  and record.t3 < 120 and record.t4u > 1.5 and record.fti < 0.97:
-                diag_id = create_diagnosis(patient, 'Hypothyroidism with Thyroid Hormone Resistance', 'MO', 'underactive thyroid gland with resistance to thyroid hormones', 'HD', False, record)
+            if record.tsh > 2.81  and record.t3 < 134 and record.t4u > 1.37 and record.fti < 1.08:
+                diag_id = create_diagnosis(patient, 'Hypothyroidism with Thyroid Hormone Resistance', 'MO', 'underactive thyroid gland with resistance to thyroid hormones', 'EN', False, record)
                 create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
                 if random.random() < 0.38:
                     create_treatment(patient, 'Liothyronine', 1, 'tablet', 'DA', diag_id)
                     if random.random() < 0.31:
                         create_treatment(patient, 'Triiodothyronine', 1, 'tablet', 'DA', diag_id)
+            elif record.tsh < 1.41 and record.t3 > 164 and record.tt4 > 8.79:
+                diag_id = create_diagnosis(patient, 'Hyperthyroidism with High TT4', 'MO', 'overactive thyroid gland with high total T4', 'EN', False, record)
+                create_treatment(patient, 'Methimazole', 1, 'tablet', 'DA', diag_id)
+                if random.random() < 0.38:
+                    create_treatment(patient, 'Propranolol', 1, 'tablet', 'DA', diag_id)
+                    if random.random() < 0.31:
+                        create_treatment(patient, 'Propylthiouracil', 1, 'tablet', 'DA', diag_id)
+            elif record.tt4 > 8.7 and record.t4u > 1.37 and record.fti < 1.1:
+                diag_id = create_diagnosis(patient, 'Thyroid Hormone Resistance', 'MO', 'resistance to thyroid hormones', 'EN', False, record)
+                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
+                if random.random() < 0.38:
+                    create_treatment(patient, 'Triiodothyronine', 1, 'tablet', 'DA', diag_id)
+                    if random.random() < 0.31:
+                        create_treatment(patient, 'Beta blockers', 1, 'tablet', 'DA', diag_id)
+            elif record.tsh > 2.97 and record.t3 < 129:
+                diag_id = create_diagnosis(patient, 'Hypothyroidism', 'MO', 'underactive thyroid gland', 'EN', False, record)
+                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
+                if random.random() < 0.38:
+                    create_treatment(patient, 'Liothyronine', 1, 'tablet', 'DA', diag_id)
+                    if random.random() < 0.31:
+                        create_treatment(patient, 'Thyroid supplement', 1, 'tablet', 'DA', diag_id)
+            elif record.tsh < 1.48 and record.t3 > 169:
+                diag_id = create_diagnosis(patient, 'Hyperthyroidism', 'MO', 'overactive thyroid gland', 'EN', False, record)
+                create_treatment(patient, 'Methimazole', 1, 'tablet', 'DA', diag_id)
+                if random.random() < 0.38:
+                    create_treatment(patient, 'Propranolol', 1, 'tablet', 'DA', diag_id)
+                    if random.random() < 0.31:
+                        create_treatment(patient, 'Radioactive iodine', 1, 'dose', 'DA', diag_id)  
+            elif record.tsh > 2.86 and record.t3 < 133:
+                diag_id = create_diagnosis(patient, 'Hypothyroidism', 'MO', 'underactive thyroid gland with enlarged thyroid gland', 'EN', False, record)
+                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
+                if random.random() < 0.38:
+                    create_treatment(patient, 'Potassium iodide', 1, 'tablet', 'DA', diag_id)
+                    if random.random() < 0.31:
+                        create_treatment(patient, 'Liothyronine', 1, 'tablet', 'DA', diag_id)
+            elif record.t4u > 1.37 and record.fti < 1.07 and record.goitre:
+                diag_id = create_diagnosis(patient, 'Thyroid Hormone Resistance with Goitre', 'MO', 'resistance to thyroid hormones with enlarged thyroid gland', 'EN', False, record)
+                create_treatment(patient, 'Levothyroxine', 1, 'tablet', 'DA', diag_id)
+                if random.random() < 0.38:
+                    create_treatment(patient, 'Triiodothyronine', 1, 'tablet', 'DA', diag_id)
+                    if random.random() < 0.31:
+                        create_treatment(patient, 'Potassium iodide', 1, 'tablet', 'DA', diag_id)
+
 
 
 
