@@ -15,7 +15,7 @@ class Command(BaseCommand):
     #    parser.add_argument('email', type=str, help='The email of the new user')
 
     def handle(self, *args, **kwargs):
-        num_of_users = 1
+        num_of_users = 49
         for i in range(num_of_users):
             username = 'patient_' + str(random.randint(1000, 9999))
             password = 'Qwerty12345@'
@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 first_name='fill in',
                 last_name='fill in',
                 date_of_birth=datetime.datetime.now(),
-                gender='M',
+                gender='O',
                 contact_number='fill in',
                 emergency_contact_number='not set',
                 emergency_contact_first_name='not set',
@@ -41,4 +41,4 @@ class Command(BaseCommand):
             )
             print('Successfully created user "%s" and their patient record' % username)
 
-        self.stdout.write(self.style.SUCCESS('Successfully created users "%num_of_users" and their patient record'))
+        self.stdout.write(self.style.SUCCESS('Successfully created users "%s" and their patient record' % num_of_users))
