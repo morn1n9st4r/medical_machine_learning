@@ -376,7 +376,7 @@ def add_record(request, record_id, test_type):
     """
     if check_user_page(request, record_id) == 'doctor':
         patient_record = get_object_or_404(PatientBaseRecord, pk=record_id)
-        current_user = get_object_or_404(DoctorBaseRecord, pk=request.user.pk)
+        current_user = get_object_or_404(DoctorBaseRecord, doctor=request.user)
 
         form_class = get_form_class(test_type)
 
