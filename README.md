@@ -18,6 +18,14 @@ MedicalML is a web-based application that leverages machine learning for medical
 - Patient and doctor record management via web interface.
 - Predictive models for various medical conditions like general cardiological disorder, psoriasis, seborrheic dermatitis, lichen planus, pityriasis rosea, chronic dermatitis, pityriasis trichosanthes, hypothyroid, hyperthyroid, hepatitis, fibrosis, cirrhosis and predicting body fat percentage based on circumference of body parts.
 
+## Architecture
+
+
+
+## Data visualization
+
+
+
 ## Data validation
 Before using data in training we must validate that preprocessing is correct and nothing left behind. Great expections is used to check whether correct types are used, no missing or incorrect (in case of finite number of variants) values and overall tables structure. This is crucial part of training pipeline and tests are done automatically inside of Airflow DAG. These checks are applied for each machine learning model that are being used and trained. 
 
@@ -61,11 +69,22 @@ docker compose up
 python3 manage.py runserver
 ```
 
+### Set up first doctor account
+Since this app is designed to for use at specific medical organizations, Doctor account cannot be registered just as simply as Patient. This limitation is because Doctor's accounts have permission to interact with private information of Patients. 
+1. Create Django admin user with
+```
+python3 manage.py createsuperuser
+```
+2. Login into Django admin console and create User model.
+3. Create DoctorBaseRecord assigned to created User in previous step.
+   
 ## Future work
 - Improve the accuracy of the machine learning models.
 - Add more predictive models for other medical conditions.
 - Enhance the user interface for better user experience.
 - Implement usage of SCD for retaining of past user data.
-
+- Implement registration of Doctor accounts with permissions granted only after admin confirmation (auto removal of this account if not activated after some time)
+- Let Doctors see Patients account only if previously interacted or searched for them (no more all profiles listed at main page)
+  
 ## Contact
 For any queries or suggestions, please feel free to reach out to us at `a.lepilo.soft@gmail.com`.
