@@ -44,7 +44,7 @@ from main_patientdermatologytest pdt
 join main_patientbaserecord pbr
 on pbr.id = pdt.patient_id
 join (
-	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid, pd.disease_name
+	select unnest(string_to_array(pd.examinations, ', '))::bigint  AS parsed_uuid, pd.disease_name
 	from main_patientdiagnosis pd
 	where pd.tags = 'SD'
 ) pui

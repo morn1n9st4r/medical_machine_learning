@@ -13,10 +13,10 @@ from main_patientthyroidtest ptt
 join main_patientbaserecord pbr
 on pbr.id = ptt.patient_id
 join (
-	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid, pd.disease_name
+	select unnest(string_to_array(pd.examinations, ', '))::bigint AS parsed_id, pd.disease_name
 	from main_patientdiagnosis pd
 	where pd.tags = 'EN'
 ) pui
-on ptt.id = pui.parsed_uuid
+on ptt.id = pui.parsed_id::bigint
 
 

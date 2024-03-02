@@ -13,7 +13,7 @@ from main_patientbloodtest pbt
 join main_patientbaserecord pbr
 on pbr.id = pbt.patient_id
 where pbt.id in (
-	select unnest(string_to_array(pd.examinations, ', '))::uuid AS parsed_uuid
+	select unnest(string_to_array(pd.examinations, ', '))::bigint AS parsed_uuid
 	from main_patientdiagnosis pd
 	where pd.tags = 'HD'
 )
