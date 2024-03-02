@@ -20,7 +20,7 @@ MedicalML is a web-based application that leverages machine learning for medical
 
 ## Architecture
 
-![Architecture of a project](arch.png)
+![Architecture of a project](img/arch.png)
 Here is displayed data flow between components of the project. Data from Kaggle is used only once, when needed to create ML models, if they are not present. Then for training is used data from RDS queried with SQL in Airflow. When model is trained, it is uploaded to S3 for further use in Django views. 
 
 ## Data visualization
