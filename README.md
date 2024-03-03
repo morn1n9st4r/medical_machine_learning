@@ -25,7 +25,9 @@ Here is displayed data flow between components of the project. Data from Kaggle 
 
 ## Data visualization
 
+![Dashboard](img/Dashboard1.png)
 
+In this dashboard we can see variable statistics about patients, their treatment and diagnosis.
 
 ## Data validation
 Before using data in training we must validate that preprocessing is correct and nothing left behind. Great expections is used to check whether correct types are used, no missing or incorrect (in case of finite number of variants) values and overall tables structure. This is crucial part of training pipeline and tests are done automatically inside of Airflow DAG. These checks are applied for each machine learning model that are being used and trained. 
