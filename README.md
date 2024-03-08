@@ -23,11 +23,31 @@ MedicalML is a web-based application that leverages machine learning for medical
 ![Architecture of a project](img/arch.png)
 Here is displayed data flow between components of the project. Data from Kaggle is used only once, when needed to create ML models, if they are not present. Then for training is used data from RDS queried with SQL in Airflow. When model is trained, it is uploaded to S3 for further use in Django views. 
 
+Apache Airflow includes followind DAGs:
+
+![DAGs](img/dags.png)
+
+The one for creating tables and moving data (either ground truth data from Kaggle, or selected data from DB by specialists) to prepare it for training of ML models. If S3 already has csv files with data, they are being saved in different folder.
+
+
+![move_ground](img/move_ground.png)
+
+
+And five DAGs for actual model training. They are similar in their design, being removing old trained model, actual training, validating and uploading results of process (e.g parameters of model to DB).
+
+
+![train_blood](img/train_blood.png)
+![train_bodyfat](img/train_bodyfat.png)
+![train_derm](img/train_derm.png)
+![train_heart](img/train_heart.png)
+![train_thyroid](img/train_thyroid.png)
+
+
 ## Data visualization
 
-![Dashboard](img/Dashboard1.png)
+![Dashboard](img/dashboard.png)
 
-In this dashboard we can see variable statistics about patients, their treatment and diagnosis.
+In this dashboard we can see variable statistics about patients, their treatment and diagnosis. Among charts we can see productivity (for the lack of better word) of doctors, number of appointments per month with runnung total, distribution of age of patients and their gender.
 
 ## Data validation
 Before using data in training we must validate that preprocessing is correct and nothing left behind. Great expections is used to check whether correct types are used, no missing or incorrect (in case of finite number of variants) values and overall tables structure. This is crucial part of training pipeline and tests are done automatically inside of Airflow DAG. These checks are applied for each machine learning model that are being used and trained. 
